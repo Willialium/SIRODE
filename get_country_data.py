@@ -14,9 +14,9 @@ def get_cleaned_country_data(country, start, end):
     start = pd.to_datetime(start)
     end = pd.to_datetime(end)
 
-    dfC = pd.read_csv('COVID-19/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv')
-    dfR = pd.read_csv('COVID-19/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv')
-    dfD = pd.read_csv('COVID-19/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv')
+    dfC = pd.read_csv('csse_covid_19_time_series/time_series_covid19_confirmed_global.csv')
+    dfR = pd.read_csv('csse_covid_19_time_series/time_series_covid19_recovered_global.csv')
+    dfD = pd.read_csv('csse_covid_19_time_series/time_series_covid19_deaths_global.csv')
 
     dfC = dfC.loc[dfC['Country/Region'] == country]
     dfC = dfC.drop(columns=['Province/State', 'Country/Region', 'Lat', 'Long'])
