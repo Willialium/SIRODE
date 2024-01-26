@@ -4,7 +4,6 @@ import numpy as np
 
 def solve_ode(t, params):
     def odes(y, t, beta, sigma, gamma, N):
-
         S, E, I, R = y
 
         dydt = [

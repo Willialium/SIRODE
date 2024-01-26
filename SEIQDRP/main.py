@@ -24,6 +24,7 @@ R0 = recovered[0]
 D0 = dead[0]
 S0 = N - Q0 - E0 - R0 - D0 - I0
 ini = [S0, E0, I0, Q0, R0, D0, 0]
+print(ini)
 #fit_params = workit(data, N)
 fit_params = [0.009429856502123, 1.190550770326202, 0.996835367442656,
               0.999998889756488, 0.016344773987195, 0.303411607828428, 14.886187811910293,
@@ -42,12 +43,12 @@ def plot():
 
     plt.figure(figsize=(6,5))
     plt.scatter(time, quarantined, s=.4)
-    plt.scatter(time, recovered, s=.4)
+    plt.scatter(time, recovered, s=.4, label='Recovered_real')
     plt.scatter(time, dead, s=.4)
     plt.plot(time2, ode_data[:, 3])
     plt.plot(time2, ode_data[:, 4])
     plt.plot(time2, ode_data[:, 5])
-
+    plt.legend()
     plt.show()
 
 plot()
