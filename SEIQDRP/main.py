@@ -50,9 +50,9 @@ def plot():
 
     plt.show()
 
+plot()
+
+#sobols = get_total_indicies(1000000, time, [quarantined, recovered, dead], fit_params, [7, .1, .1, .3, .101010, 0, 0, 0, 0, 0, 0], N)
+#print(sobols)
+
 #plot()
-
-sobols = get_total_indicies(1000000, time, [quarantined, recovered, dead], fit_params, [7, .1, .1, .3, .101010, 0, 0, 0, 0, 0, 0], N)
-print(sobols)
-
-# plot()
