@@ -14,7 +14,8 @@ def load_csv_files(directory_path):
         df = pd.read_csv(file_path)
         # convert data column to datetime
         df['data'] = pd.to_datetime(df['data'])
-
+        # remove the time from the datetime
+        df['data'] = df['data'].dt.date
         df.rename(columns={
             'data': 'Date',
             'stato':'Country',
