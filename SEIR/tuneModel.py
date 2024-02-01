@@ -14,26 +14,26 @@ def SEIR_fit(data, pop):
     confirmed = data['Total_Current_Positive_Cases'].to_numpy()
     recovered = data['Recovered'].to_numpy()
 
-    coef_guess = [.09, .15, .03] # beta, sigma, gamma
+    coef_guess = [0.04, 15, 0.01] # beta, sigma, gamma
     bounds = [
         (0,5),
-        (0,100),
+        (0,50),
         (0,5)
     ]
     def objective_function(params, time_points, confirmed, recovered, N):
         I0 = confirmed[0]
-        E0 = confirmed[0]
+        E0 = .3*confirmed[0]
         R0 = recovered[0]
         S0 = N - E0 - I0 - R0
         params = params.tolist() + [N]
         ini_values = [S0, E0, I0, R0]
         predicted_solution = solve_ode_SEIR(time_points, ini_values + params)
 
-        #SSI = np.sum(np.abs(confirmed - predicted_solution[:, 2])) * INFECTED_WEIGHT / len(confirmed)
-        #SSR = np.sum(np.abs(recovered - predicted_solution[:, 3])) / len(recovered)
+        SSI = np.sum(np.abs(confirmed - predicted_solution[:, 2])) * INFECTED_WEIGHT / len(confirmed)
+        SSR = np.sum(np.abs(recovered - predicted_solution[:, 3])) / len(recovered)
 
-        SSI = np.sum((confirmed - predicted_solution[:, 2])**2) * INFECTED_WEIGHT / len(confirmed)
-        SSR = np.sum((recovered - predicted_solution[:, 3])**2) / len(recovered)
+        #SSI = np.sum((confirmed - predicted_solution[:, 2])**2) * INFECTED_WEIGHT / len(confirmed)
+        #SSR = np.sum((recovered - predicted_solution[:, 3])**2) / len(recovered)
 
         loss = SSI + SSR
         return loss
@@ -70,7 +70,7 @@ def SEIRP_fit(data, pop):
     confirmed = data['Total_Current_Positive_Cases'].to_numpy()
     recovered = data['Recovered'].to_numpy()
 
-    coef_guess = [.01, .01, .15, .004] # beta, sigma, gamma
+    coef_guess = [0.07861792711039865, 0.7616354118609561, 0.13888766257731705, 0.024868741025170418] # beta, sigma, gamma
     bounds = [
         (0, 5),
         (0,5),
@@ -107,9 +107,9 @@ def SEIQR_fit(data, pop):
     recovered = data['Recovered'].to_numpy()
     quarantined = data['Home_Confined'].to_numpy()
 
-    coef_guess = [.01, .15, .04, .05] # beta, sigma, gamma, delta
+    coef_guess = [0.7616354118609561, 0.13888766257731705, 0.024868741025170418, .12766866818704564] # beta, sigma, gamma, delta
     bounds = [
-        (0,5),
+        (0,50),
         (0,100),
         (0,5),
         (0, 5)
@@ -147,7 +147,7 @@ def SEIQDRP_fit(data, pop):
     quarantined = data['Home_Confined'].to_numpy()
     dead = data['Dead'].to_numpy()
 
-    coef_guess = [.01, 1, 1, 1, .01, .3, 15, .03, .04, 5]
+    coef_guess = [0.05018199919915549, 0.36119755018385835, 0.7085130515276519, 0.039401011876595976, 0.04084461787800722, 0.2823836409399339, 13.08872540261323, 0.020156623608517117, 0.0, 4.362924640953117]
     bounds = [
         (0,1),
         (0,5),

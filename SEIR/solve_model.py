@@ -54,7 +54,7 @@ def solve_ode_SEIQR(t, params):
 
 def solve_ode_SEIQDRP(t, params):
     #print('solving with:', params)
-    def odes(y, t, alpha, beta, delta, gamma, l1, l2, l3, k1, k2, k3, N):
+    def odes(y, t, alpha, beta, sigma, gamma, l1, l2, l3, k1, k2, k3, N):
 
         S, E, I, Q, R, D, P = y
 
@@ -68,9 +68,9 @@ def solve_ode_SEIQDRP(t, params):
             #return k1 + np.exp(-k2*(t+k3))
         dydt = [
             -alpha * S - beta * S * I / N,  # Susceptible cases
-            -gamma * E + beta * S * I / N,  # Exposed cases
-            gamma * E - delta * I,  # Infectious cases
-            delta * I - Lambda(t, l1, l2, l3) * Q - Kappa(t, k1, k2, k3) * Q,  # Quarantined cases
+            beta * S * I / N - sigma * E,  # Exposed cases
+            sigma * E - gamma * I,  # Infectious cases
+            gamma * I - Lambda(t, l1, l2, l3) * Q - Kappa(t, k1, k2, k3) * Q,  # Quarantined cases
             Lambda(t, l1, l2, l3) * Q,  # Recovered cases
             Kappa(t, k1, k2, k3) * Q,  # Dead cases
             alpha * S  # Insusceptible cases
