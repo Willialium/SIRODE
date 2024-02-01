@@ -12,7 +12,7 @@ data = data.groupby('Date').sum().reset_index()
 def plot():
     plt.figure(figsize=(15,8))
     plot_data = data[data['Date'] >= '2020-03-01']
-    plot_data = plot_data[plot_data['Date'] <= '2021-06-01']
+    plot_data = plot_data[plot_data['Date'] <= '2021-06-21']
 
     plot_real_time = plot_data['Date'].to_numpy()
     plot_time = [i for i in range(len(plot_real_time))]
@@ -39,7 +39,7 @@ time_mult = 1
 
 def SEIR_test():
 
-    N=6e5
+    #N=6e5
 
     I0 = confirmed[0]
     E0 = I0
@@ -64,18 +64,18 @@ def SEIR_test():
         #plt.xticks(np.arange(0, len(real_time), len(real_time)-1), [''] + [real_time[-1]], rotation=90)
         plt.xticks(np.arange(0, len(real_time), 5), real_time[::5], rotation=90)
 
-        plt.scatter(time, recovered, s=.4, label='Recovered_real')
-        #plt.plot(time2, ode_data[:, 3], label='Recovered')
-        plt.scatter(time, confirmed, s=.4, label='Infected_real')
-        plt.plot(time2, ode_data[:, 2], label='Infected')
-        plt.plot(time2, ode_data[:, 1], label='Exposed')
+        plt.scatter(time, recovered, s=.4, label='Recovered_real', color='blue')
+        plt.plot(time2, ode_data[:, 3], label='Recovered', color='blue')
+        plt.scatter(time, confirmed, s=.4, label='Infected_real', color='orange')
+        plt.plot(time2, ode_data[:, 2], label='Infected', color='orange')
+        plt.plot(time2, ode_data[:, 1], label='Exposed', color='green')
         #plt.plot(time2, ode_data[:, 0], label='Susceptible')
 
         ode_latex = r'$\frac{dS}{dt} = -\alpha S -\beta\frac{S*I}{N}$'+ '\n' + \
                     r'$\frac{dE}{dt} = \beta\frac{S*I}{N} - \sigma E$' + '\n' + \
                     r'$\frac{dI}{dt} = \sigma E - \gamma I$' + '\n' + \
                     r'$\frac{dR}{dt} = \gamma I$'
-        plt.annotate(ode_latex, xy=(-0.45, 1), xycoords='axes fraction', fontsize=14, ha='left', va='top')
+        plt.annotate(ode_latex, xy=(1, 1), xycoords='axes fraction', fontsize=14, ha='left', va='top')
         plt.ticklabel_format(axis='y', style='sci', scilimits=(0, 0))
         plt.gca().yaxis.get_major_formatter().set_powerlimits((0, 0))
 
@@ -107,11 +107,11 @@ def SEIRP_test():
         #plt.xticks(np.arange(0, len(real_time), len(real_time)-1), [''] + [real_time[-1]], rotation=90)
         plt.xticks(np.arange(0, len(real_time), 5), real_time[::5], rotation=90)
 
-        plt.scatter(time, recovered, s=.4, label='Recovered_real')
-        plt.plot(time2, ode_data[:, 3], label='Recovered')
-        plt.scatter(time, confirmed, s=.4, label='Infected_real')
-        plt.plot(time2, ode_data[:, 2], label='Infected')
-        plt.plot(time2, ode_data[:, 1], label='Exposed')
+        plt.scatter(time, recovered, s=.4, label='Recovered_real', color='blue')
+        plt.plot(time2, ode_data[:, 3], label='Recovered', color='blue')
+        plt.scatter(time, confirmed, s=.4, label='Infected_real', color='orange')
+        plt.plot(time2, ode_data[:, 2], label='Infected', color='orange')
+        plt.plot(time2, ode_data[:, 1], label='Exposed', color='green')
         #plt.plot(time2, ode_data[:, 4], label='Immune')
         #plt.plot(time2, ode_data[:, 0], label='Susceptible')
 
@@ -153,20 +153,20 @@ def SEIQR_test():
         #plt.xticks(np.arange(0, len(real_time), len(real_time)-1), [''] + [real_time[-1]], rotation=90)
         plt.xticks(np.arange(0, len(real_time), 5), real_time[::5], rotation=90)
 
-        plt.scatter(time, recovered, s=.4, label='Recovered_real')
-        plt.plot(time2, ode_data[:, 4], label='Recovered')
-        plt.scatter(time, confirmed, s=.4, label='Infected_real')
-        plt.plot(time2, ode_data[:, 2], label='Infected')
-        plt.scatter(time, quarantined, s=.4, label='Quarantined_real')
-        #plt.plot(time2, ode_data[:, 3], label='Quarantined')
-        #plt.plot(time2, ode_data[:, 1], label='Exposed')
+        plt.scatter(time, recovered, s=.4, label='Recovered_real', color='blue')
+        plt.plot(time2, ode_data[:, 4], label='Recovered', color='blue')
+        plt.scatter(time, confirmed, s=.4, label='Infected_real', color='orange')
+        plt.plot(time2, ode_data[:, 2], label='Infected', color='orange')
+        plt.scatter(time, quarantined, s=.4, label='Quarantined_real', color='red')
+        plt.plot(time2, ode_data[:, 3], label='Quarantined', color='red')
+        #plt.plot(time2, ode_data[:, 1], label='Exposed', color='green')
 
         ode_latex = r'$\frac{dS}{dt} = -\beta\frac{S*I}{N}$'+ '\n' + \
                     r'$\frac{dE}{dt} = \beta\frac{S*I}{N} - \sigma E$' + '\n' + \
                     r'$\frac{dI}{dt} = \sigma E - \delta I$' + '\n' + \
                     r'$\frac{dQ}{dt} = \delta I - \gamma Q$' + '\n' + \
                     r'$\frac{dR}{dt} = \gamma Q$'
-        plt.annotate(ode_latex, xy=(-0.45, 1), xycoords='axes fraction', fontsize=14, ha='left', va='top')
+        plt.annotate(ode_latex, xy=(1, 1), xycoords='axes fraction', fontsize=14, ha='left', va='top')
         plt.ticklabel_format(axis='y', style='sci', scilimits=(0, 0))
         plt.gca().yaxis.get_major_formatter().set_powerlimits((0, 0))
 
@@ -193,27 +193,27 @@ def SEIQDRP_test():
     def plot():
         plt.subplot(2, 2, 4)
 
-        plt.title('Population = {:.0e}\nSEIQDRP Model with beta = {:.5f}, sigma = {:.5f}\ngamma = {:.5f}'.format(N,fit_params[1], fit_params[2], fit_params[3]))
+        plt.title('Population = {:.0e}\nSEIQDRP Model with alpha = {:.5f}, beta = {:.5f}\nsigma = {:.5f}, gamma = {:.5f}'.format(N,fit_params[0], fit_params[1], fit_params[2], fit_params[3]))
 
         plt.ylabel('Population in Compartment')
         #plt.xticks(np.arange(0, len(real_time), len(real_time)-1), [''] + [real_time[-1]], rotation=90)
         plt.xticks(np.arange(0, len(real_time), 5), real_time[::5], rotation=90)
 
-        plt.scatter(time, recovered, s=.4, label='Recovered_real')
-        plt.plot(time2, ode_data[:, 4], label='Recovered')
-        plt.scatter(time, confirmed, s=.4, label='Infected_real')
-        plt.plot(time2, ode_data[:, 2], label='Infected')
-        plt.scatter(time, quarantined, s=.4, label='Quarantined_real')
-        plt.plot(time2, ode_data[:, 3], label='Quarantined')
-        plt.plot(time2, ode_data[:, 1], label='Exposed')
-        plt.plot(time2, ode_data[:, 5], label='Dead')
+        plt.scatter(time, recovered, s=.4, label='Recovered_real', color='blue')
+        plt.plot(time2, ode_data[:, 4], label='Recovered', color='blue')
+        plt.scatter(time, confirmed, s=.4, label='Infected_real', color='orange')
+        plt.plot(time2, ode_data[:, 2], label='Infected', color='orange')
+        plt.scatter(time, quarantined, s=.4, label='Quarantined_real', color='red')
+        plt.plot(time2, ode_data[:, 3], label='Quarantined', color='red')
+        plt.plot(time2, ode_data[:, 1], label='Exposed', color='green')
+        plt.plot(time2, ode_data[:, 5], label='Dead', color='black')
 
         ode_latex = r'$\frac{dS}{dt} = -\alpha S -\beta\frac{S*I}{N}$'+ '\n' + \
                     r'$\frac{dE}{dt} = \beta\frac{S*I}{N} - \gamma E$' + '\n' + \
                     r'$\frac{dI}{dt} = \gamma E - \delta I$' + '\n' + \
-                    r'$\frac{dQ}{dt} = \delta I - \lambda Q$ - ' + r'$\kappa Q$' + '\n' + \
-                    r'$\frac{dR}{dt} = \lambda Q$' + '\n' + \
-                    r'$\frac{dD}{dt} = \kappa Q$' + '\n' + \
+                    r'$\frac{dQ}{dt} = \delta I - \lambda(t) Q$ - ' + r'$\kappa(t) Q$' + '\n' + \
+                    r'$\frac{dR}{dt} = \lambda(t) Q$' + '\n' + \
+                    r'$\frac{dD}{dt} = \kappa(t) Q$' + '\n' + \
                     r'$\frac{dP}{dt} = \alpha S$'
         plt.annotate(ode_latex, xy=(1, 1), xycoords='axes fraction', fontsize=14, ha='left', va='top')
         plt.ticklabel_format(axis='y', style='sci', scilimits=(0, 0))

@@ -22,18 +22,18 @@ def SEIR_fit(data, pop):
     ]
     def objective_function(params, time_points, confirmed, recovered, N):
         I0 = confirmed[0]
-        E0 = .3*confirmed[0]
+        E0 = confirmed[0]
         R0 = recovered[0]
         S0 = N - E0 - I0 - R0
         params = params.tolist() + [N]
         ini_values = [S0, E0, I0, R0]
         predicted_solution = solve_ode_SEIR(time_points, ini_values + params)
 
-        SSI = np.sum(np.abs(confirmed - predicted_solution[:, 2])) * INFECTED_WEIGHT / len(confirmed)
-        SSR = np.sum(np.abs(recovered - predicted_solution[:, 3])) / len(recovered)
+        #SSI = np.sum(np.abs(confirmed - predicted_solution[:, 2])) * INFECTED_WEIGHT / len(confirmed)
+        #SSR = np.sum(np.abs(recovered - predicted_solution[:, 3])) / len(recovered)
 
-        #SSI = np.sum((confirmed - predicted_solution[:, 2])**2) * INFECTED_WEIGHT / len(confirmed)
-        #SSR = np.sum((recovered - predicted_solution[:, 3])**2) / len(recovered)
+        SSI = np.sum((confirmed - predicted_solution[:, 2])**2) * INFECTED_WEIGHT / len(confirmed)
+        SSR = np.sum((recovered - predicted_solution[:, 3])**2) / len(recovered)
 
         loss = SSI + SSR
         return loss
