@@ -19,7 +19,7 @@ fig, ax = plt.subplots()
 line, = ax.plot(t, f(t, init_amplitude, init_frequency), lw=2)
 ax.set_xlabel('Time [s]')
 
-# adjust the main plot to make room for the sliders
+# adjust the main.py plot to make room for the sliders
 fig.subplots_adjust(left=0.25, bottom=0.25)
 
 # Make a horizontal slider to control the frequency.

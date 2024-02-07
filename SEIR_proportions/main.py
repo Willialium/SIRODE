@@ -48,7 +48,6 @@ def SEIR_test():
     ini = [S0, E0, I0, R0]
 
     fit_params = SEIR_fit(data, N)
-    print(fit_params)
     time2 = [t for t in range(len(time * time_mult))]
 
     ode_data = solve_ode_SEIR(time2, ini + fit_params)
@@ -186,7 +185,7 @@ def SEIQDRP_test():
     time2 = [t for t in range(len(time*time_mult))]
 
     ode_data = solve_ode_SEIQDRP(time2, ini + fit_params + [N])
-
+    print(time2[:3], len(time2))
 
     def plot():
         plt.subplot(2, 2, 4)
@@ -227,9 +226,9 @@ def SEIQDRP_test():
 
 
 def test_ode():
-    #SEIR_test()
-    #SEIRP_test()
-    #SEIQR_test()
+    SEIR_test()
+    SEIRP_test()
+    SEIQR_test()
     SEIQDRP_test()
 
     plt.tight_layout()

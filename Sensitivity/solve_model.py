@@ -86,5 +86,4 @@ def solve_ode_SEIQDRP(t, params):
     y = [params[0], params[1], params[2], params[3], params[4], params[5], params[6]]
     sol = odeint(odes, y, t, (
     params[7], params[8], params[9], params[10], params[11], params[12], params[13], params[14], params[15], params[16]))
-
     return sol
