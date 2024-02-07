@@ -3,8 +3,20 @@ import numpy as np
 
 from solve_model import solve_ode_SEIR, solve_ode_SEIRP, solve_ode_SEIQR, solve_ode_SEIQDRP
 
-time = np.linspace(0, 140)
-
+time = np.array([i for i in range(0, 140)])
+scales = {
+    'SEIR': {
+        'Xbeta': 1,
+        'Xsigma': 1,
+        'Xgamma': 1,
+    },
+    'SEIRP': {
+        'Xbeta': 1,
+        'Xsigma': 1,
+        'Xgamma': 1,
+        'Xalpha': 1
+    }
+}
 inis = {
     'E0': 5e-5,
     'I0': 5e-5,
@@ -28,45 +40,61 @@ params = {
 }
 
 
-def SEIR_test(Xbeta = 1, subplot=1):
+def SEIR_test(Xbeta = None, Xsigma = None, Xgamma = None):
+    if Xbeta is not None:
+        scales['SEIR']['Xbeta'] = Xbeta
+    if Xsigma is not None:
+        scales['SEIR']['Xsigma'] = Xsigma
+    if Xgamma is not None:
+        scales['SEIR']['Xgamma'] = Xgamma
+
+
     S0 = 1 - inis['E0'] - inis['I0'] - inis['R0']
 
     ini = [S0, inis['E0'], inis['I0'], inis['R0']]
 
-    fit_params = [params['beta']*Xbeta, params['sigma'], params['gamma']]
+    fit_params = [params['beta']*scales['SEIR']['Xbeta'], params['sigma']*scales['SEIR']['Xsigma'], params['gamma']*scales['SEIR']['Xgamma']]
 
-    ode_data = solve_ode_SEIR(time, ini + fit_params)
-
+    ode_data = solve_ode_SEIR(time, ini + fit_params).T
+    print(scales['SEIR'])
     return ode_data
 
 
-def SEIRP_test(subplot=2):
+def SEIRP_test(Xbeta = None, Xsigma = None, Xgamma = None):
+
+    if Xbeta is not None:
+        scales['SEIRP']['Xbeta'] = Xbeta
+    if Xsigma is not None:
+        scales['SEIRP']['Xsigma'] = Xsigma
+    if Xgamma is not None:
+        scales['SEIRP']['Xgamma'] = Xgamma
+
     S0 = 1 - inis['E0'] - inis['I0'] - inis['R0'] - inis['P0']
     ini = [S0, inis['E0'], inis['I0'], inis['R0'], inis['P0']]
 
-    fit_params = [params['alpha'], params['beta'], params['sigma'], params['gamma']]
+    fit_params = [params['alpha']*scales['SEIRP']['Xalpha'], params['beta']*scales['SEIRP']['Xbeta'], params['sigma']*scales['SEIRP']['Xsigma'], params['gamma']*scales['SEIRP']['Xgamma']]
 
-    ode_data = solve_ode_SEIRP(time, ini + fit_params)
+    ode_data = solve_ode_SEIRP(time, ini + fit_params).T
 
     return ode_data
 
 
-def SEIQR_test(subplot=3):
+def SEIQR_test():
     S0 = 1 - inis['E0'] - inis['I0'] - inis['R0'] - inis['Q0']
     ini = [S0, inis['E0'], inis['I0'], inis['Q0'], inis['R0']]
 
     fit_params = [params['beta'], params['sigma'], params['gamma'], params['laambda']]
-    ode_data = solve_ode_SEIQR(time, ini + fit_params)
+    ode_data = solve_ode_SEIQR(time, ini + fit_params).T
 
     return ode_data
 
-def SEIQDRP_test(subplot=4):
+def SEIQDRP_test():
     S0 = 1 - inis['Q0'] - inis['E0'] - inis['R0'] - inis['D0'] - inis['I0'] - inis['P0']
     ini = [S0, inis['E0'], inis['I0'], inis['Q0'], inis['R0'], inis['P0'], inis['D0']]
 
     fit_params = [params['alpha'], params['beta'], params['sigma'], params['gamma'], params['l1'], params['l2'],
                   params['l3'], params['k1'], params['k2'], params['k3']]
 
-    ode_data = solve_ode_SEIQDRP(time, ini + fit_params)
+    ode_data = solve_ode_SEIQDRP(time, ini + fit_params).T
 
     return ode_data
