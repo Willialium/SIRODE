@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import minimize
 
-from solve_model import solve_ode_SEIR,solve_ode_SEIRP, solve_ode_SEIQR,solve_ode_SEIQDRP
+from solve_model import solve_ode_SEIR,solve_ode_SEIRP, solve_ode_SEIQR,solve_ode_SEIQDRP, solve_ode_SEIR_2, solve_ode_SEIRDC
 
 INFECTED_WEIGHT = 1
 
@@ -180,6 +180,89 @@ def SEIQDRP_fit(data, pop):
         return loss
 
     result = minimize(objective_function, coef_guess, args=(time, confirmed, quarantined, recovered, dead, pop), bounds=bounds)
+    optimized_params = result.x
+
+    return optimized_params.tolist()
+
+def SEIR_2_fit(data, pop):
+    time = data['Date'].to_numpy()
+    time = [i for i in range(len(time))]
+    confirmed = data['Total_Current_Positive_Cases'].to_numpy()
+    recovered = data['Recovered'].to_numpy()
+
+    coef_guess = [0.06, .000000003, .00000001, .01, .09, .0008, .12, .5, .03, .8]
+    bounds = [
+        (0, 1),
+        (0, 1),
+        (0, 1),
+        (0, 1),
+        (0, 1),
+        (0, 1),
+        (0, 1),
+        (0, 1),
+        (0, 1),
+        (0, 1)
+    ]
+
+    def objective_function(params, time_points, confirmed, recovered, N):
+        I0 = confirmed[0]
+        E0 = confirmed[0]
+        R0 = recovered[0]
+        S0 = N - E0 - I0 - R0
+        params = params.tolist() + [N]
+        ini_values = [S0, E0, I0, R0]
+        predicted_solution = solve_ode_SEIR_2(time_points, ini_values + params)
+
+        SSI = np.sum((confirmed - predicted_solution[:, 2]) ** 2) * INFECTED_WEIGHT / len(confirmed)
+        SSR = np.sum((recovered - predicted_solution[:, 3]) ** 2) / len(recovered)
+
+        loss = SSI + SSR
+        return loss
+
+
+    result = minimize(objective_function, coef_guess, args=(time, confirmed, recovered, pop), bounds=bounds)
+    # result = differential_evolution(objective_function, bounds, args=(time, confirmed, recovered, pop))
+    optimized_params = result.x
+
+    return optimized_params.tolist()
+
+def SEIRDC_fit(data, pop):
+    time = data['Date'].to_numpy()
+    time = [i for i in range(len(time))]
+    confirmed = data['Total_Current_Positive_Cases'].to_numpy()
+    recovered = data['Recovered'].to_numpy()
+
+    coef_guess = [0.6819721637078082, 0.05866132107331775, 0.5826296778086761, 0.41573396379306055, 0.027111639622526516, 0.01095489785855386, 0.05147643344123707]
+    bounds = [
+        (0, 5),
+        (0, 5),
+        (0, 5),
+        (0, 5),
+        (0, 5),
+        (0, 5),
+        (0, 5)
+    ]
+
+    def objective_function(params, time_points, confirmed, recovered, N):
+        I0 = confirmed[0]
+        E0 = confirmed[0]
+        R0 = recovered[0]
+        D0 = 0
+        C0 = 0
+        S0 = N - E0 - I0 - R0 - D0 - C0
+        params = params.tolist() + [N]
+        ini_values = [S0, E0, I0, R0, D0, C0]
+        predicted_solution = solve_ode_SEIRDC(time_points, ini_values + params)
+
+        SSI = np.sum((confirmed - predicted_solution[:, 2]) ** 2) * INFECTED_WEIGHT / len(confirmed)
+        SSR = np.sum((recovered - predicted_solution[:, 3]) ** 2) / len(recovered)
+
+        loss = SSI + SSR
+        return loss
+
+
+    result = minimize(objective_function, coef_guess, args=(time, confirmed, recovered, pop), bounds=bounds)
+    # result = differential_evolution(objective_function, bounds, args=(time, confirmed, recovered, pop))
     optimized_params = result.x
 
     return optimized_params.tolist()

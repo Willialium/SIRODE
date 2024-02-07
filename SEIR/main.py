@@ -2,8 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from solve_model import solve_ode_SEIR, solve_ode_SEIRP, solve_ode_SEIQR, solve_ode_SEIQDRP
-from tuneModel import SEIR_fit, SEIRP_fit, SEIQR_fit, SEIQDRP_fit
+from solve_model import solve_ode_SEIR, solve_ode_SEIRP, solve_ode_SEIQR, solve_ode_SEIQDRP, solve_ode_SEIR_2, solve_ode_SEIRDC
+from tuneModel import SEIR_fit, SEIRP_fit, SEIQR_fit, SEIQDRP_fit, SEIR_2_fit, SEIRDC_fit
 
 data = pd.read_csv('../combined_data.csv')[['Date', 'Total_Current_Positive_Cases', 'Recovered', 'Home_Confined', 'Dead', 'Region_Name']]
 #data = data[data['Region_Name'] == 'Lombardia']
@@ -12,7 +12,7 @@ data = data.groupby('Date').sum().reset_index()
 def plot():
     plt.figure(figsize=(15,8))
     plot_data = data[data['Date'] >= '2020-03-01']
-    plot_data = plot_data[plot_data['Date'] <= '2021-06-21']
+    plot_data = plot_data[plot_data['Date'] <= '2020-06-21']
 
     plot_real_time = plot_data['Date'].to_numpy()
     plot_time = [i for i in range(len(plot_real_time))]
@@ -35,7 +35,7 @@ quarantined = data['Home_Confined'].to_numpy()
 dead = data['Dead'].to_numpy()
 real_time = data['Date'].to_numpy()
 time = [i for i in range(len(real_time))]
-time_mult = 1
+time_mult = 2
 
 def SEIR_test():
 
@@ -46,7 +46,7 @@ def SEIR_test():
     R0 = recovered[0]
     S0 = N - E0 - R0 - I0
     ini = [S0, E0, I0, R0]
-
+    print(N, I0, E0, R0, S0)
     fit_params = SEIR_fit(data, N)
     print(fit_params)
     time2 = [t for t in range(len(time * time_mult))]
@@ -223,14 +223,95 @@ def SEIQDRP_test():
 
     plot()
 
+def SEIR_2_test():
+    I0 = confirmed[0]
+    E0 = I0
+    R0 = recovered[0]
+    S0 = N - E0 - R0 - I0
+    ini = [S0, E0, I0, R0]
 
+    fit_params = SEIR_2_fit(data, N)
+    print(fit_params)
+    time2 = [t for t in range(len(time * time_mult))]
 
+    ode_data = solve_ode_SEIR_2(time2, ini + fit_params + [N])
 
+    def plot():
+        plt.subplot(2, 2, 4)
+        #plt.title('Population = {:.0e}\nSEIR Model with beta = {:.5f}\nsigma = {:.5f}, gamma = {:.5f}'.format(N,fit_params[0],fit_params[1],fit_params[2]))
+
+        plt.ylabel('Population in Compartment')
+        # plt.xticks(np.arange(0, len(real_time), len(real_time)-1), [''] + [real_time[-1]], rotation=90)
+        plt.xticks(np.arange(0, len(real_time), 5), real_time[::5], rotation=90)
+
+        plt.scatter(time, recovered, s=.4, label='Recovered_real', color='blue')
+        plt.plot(time2, ode_data[:, 3], label='Recovered', color='blue')
+        plt.scatter(time, confirmed, s=.4, label='Infected_real', color='orange')
+        plt.plot(time2, ode_data[:, 2], label='Infected', color='orange')
+        plt.plot(time2, ode_data[:, 1], label='Exposed', color='green')
+        # plt.plot(time2, ode_data[:, 0], label='Susceptible')
+
+        ode_latex = r'$\frac{dS}{dt} = -\beta\frac{S*I}{N}$' + '\n' + \
+                    r'$\frac{dE}{dt} = \beta\frac{S*I}{N} - \sigma E$' + '\n' + \
+                    r'$\frac{dI}{dt} = \sigma E - \gamma I$' + '\n' + \
+                    r'$\frac{dR}{dt} = \gamma I$'
+        plt.annotate(ode_latex, xy=(1, 1), xycoords='axes fraction', fontsize=14, ha='left', va='top')
+        plt.ticklabel_format(axis='y', style='sci', scilimits=(0, 0))
+        plt.gca().yaxis.get_major_formatter().set_powerlimits((0, 0))
+
+        plt.legend()
+
+    plot()
+def SEIRDC_test():
+    N=6e7
+    I0 = confirmed[0]
+    E0 = I0
+    R0 = recovered[0]
+    S0 = N - E0 - R0 - I0
+    D0 = 0
+    C0 = 0
+    ini = [S0, E0, I0, R0, D0, C0]
+
+    fit_params = SEIRDC_fit(data, N)
+    #fit_params = [0.5, 0.05, 3**(-1), 5**(-1), 22**(-1), 0.2, 11.2**(-1)]
+    print(fit_params)
+    time2 = [t for t in range(len(time * time_mult))]
+
+    ode_data = solve_ode_SEIRDC(time2, ini + fit_params + [N])
+
+    def plot():
+        #plt.subplot(2, 2, 4)
+        # plt.title('Population = {:.0e}\nSEIR Model with beta = {:.5f}\nsigma = {:.5f}, gamma = {:.5f}'.format(N,fit_params[0],fit_params[1],fit_params[2]))
+
+        plt.ylabel('Population in Compartment')
+        # plt.xticks(np.arange(0, len(real_time), len(real_time)-1), [''] + [real_time[-1]], rotation=90)
+        plt.xticks(np.arange(0, len(real_time), 5), real_time[::5], rotation=90)
+
+        plt.scatter(time, recovered, s=.4, label='Recovered_real', color='blue')
+        plt.plot(time2, ode_data[:, 3], label='Recovered', color='blue')
+        plt.scatter(time, confirmed, s=.4, label='Infected_real', color='orange')
+        plt.plot(time2, ode_data[:, 2], label='Infected', color='orange')
+        plt.plot(time2, ode_data[:, 1], label='Exposed', color='green')
+        # plt.plot(time2, ode_data[:, 0], label='Susceptible')
+
+        '''ode_latex = r'$\frac{dS}{dt} = -\beta\frac{S*I}{N}$' + '\n' + \
+                    r'$\frac{dE}{dt} = \beta\frac{S*I}{N} - \sigma E$' + '\n' + \
+                    r'$\frac{dI}{dt} = \sigma E - \gamma I$' + '\n' + \
+                    r'$\frac{dR}{dt} = \gamma I$'
+        plt.annotate(ode_latex, xy=(1, 1), xycoords='axes fraction', fontsize=14, ha='left', va='top')'''
+        plt.ticklabel_format(axis='y', style='sci', scilimits=(0, 0))
+        plt.gca().yaxis.get_major_formatter().set_powerlimits((0, 0))
+
+        plt.legend()
+
+    plot()
 def test_ode():
-    SEIR_test()
-    SEIRP_test()
-    SEIQR_test()
-    SEIQDRP_test()
+    #SEIR_test()
+    #SEIRP_test()
+    #SEIQR_test()
+    #SEIQDRP_test()
+    SEIR_2_test()
+    #SEIRDC_test()
 
     plt.tight_layout()
     plt.show()
