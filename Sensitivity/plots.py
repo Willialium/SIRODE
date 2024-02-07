@@ -83,8 +83,8 @@ def create_SEIR_plot(ax, SEIR_test_result):
     ax.set_ylabel('Proportion in\neach compartment')
     ax.legend()
 
-    ode_latex = r'$\frac{dS}{dt} = -\beta\frac{S*I}{N}$' + '\n' + \
-                r'$\frac{dE}{dt} = \beta\frac{S*I}{N} - \sigma E$' + '\n' + \
+    ode_latex = r'$\frac{dS}{dt} = -\beta SI$' + '\n' + \
+                r'$\frac{dE}{dt} = \beta SI - \sigma E$' + '\n' + \
                 r'$\frac{dI}{dt} = \sigma E - \gamma I$' + '\n' + \
                 r'$\frac{dR}{dt} = \gamma I$'
     ax.annotate(ode_latex, xy=(1, 1), xycoords='axes fraction', fontsize=14, ha='left', va='top')
@@ -96,8 +96,8 @@ def create_SEIRP_plot(ax, SEIRP_test_result):
     for i in range(1,4):
         lines.append(ax.plot(time, SEIRP_test_result[i], color=colors[i], label='SEIRP'[i]))
     ax.legend()
-    ode_latex = r'$\frac{dS}{dt} = -\alpha S -\beta\frac{S*I}{N}$' + '\n' + \
-                r'$\frac{dE}{dt} = \beta\frac{S*I}{N} - \sigma E$' + '\n' + \
+    ode_latex = r'$\frac{dS}{dt} = -\alpha S -\beta SI$' + '\n' + \
+                r'$\frac{dE}{dt} = \beta SI - \sigma E$' + '\n' + \
                 r'$\frac{dI}{dt} = \sigma E - \gamma I$' + '\n' + \
                 r'$\frac{dR}{dt} = \gamma I$' + '\n' + \
                 r'$\frac{dP}{dt} = \alpha S$'
@@ -111,8 +111,8 @@ def create_SEIQR_plot(ax, SEIQR_test_result):
     ax.legend()
     ax.set_xlabel('Time')
     ax.set_ylabel('Proportion in\neach compartment')
-    ode_latex = r'$\frac{dS}{dt} = -\beta\frac{S*I}{N}$' + '\n' + \
-                r'$\frac{dE}{dt} = \beta\frac{S*I}{N} - \sigma E$' + '\n' + \
+    ode_latex = r'$\frac{dS}{dt} = -\beta SI$' + '\n' + \
+                r'$\frac{dE}{dt} = \beta SI - \sigma E$' + '\n' + \
                 r'$\frac{dI}{dt} = \sigma E - \delta I$' + '\n' + \
                 r'$\frac{dQ}{dt} = \delta I - \gamma Q$' + '\n' + \
                 r'$\frac{dR}{dt} = \gamma Q$'
@@ -125,8 +125,8 @@ def create_SEIQDRP_plot(ax, SEIQDRP_test_result):
         lines.append(ax.plot(time, SEIQDRP_test_result[i], color=colors[i], label='SEIQDRP'[i]))
     ax.legend()
     ax.set_xlabel('Time')
-    ode_latex = r'$\frac{dS}{dt} = -\alpha S -\beta\frac{S*I}{N}$' + '\n' + \
-                r'$\frac{dE}{dt} = \beta\frac{S*I}{N} - \sigma E$' + '\n' + \
+    ode_latex = r'$\frac{dS}{dt} = -\alpha S -\beta SI$' + '\n' + \
+                r'$\frac{dE}{dt} = \beta SI - \sigma E$' + '\n' + \
                 r'$\frac{dI}{dt} = \sigma E - \gamma I$' + '\n' + \
                 r'$\frac{dQ}{dt} = \gamma I - \lambda(t) Q$ - ' + r'$\kappa(t) Q$' + '\n' + \
                 r'$\frac{dR}{dt} = \lambda(t) Q$' + '\n' + \
