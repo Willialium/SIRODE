@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import minimize
 
-from solve_model import solve_ode_SEIR,solve_ode_SEIRP, solve_ode_SEIQR,solve_ode_SEIQDRP
+from solve_model import solve_ode_SEIR,solve_ode_SEIRP, solve_ode_SEIQR,solve_ode_SEIQRDP
 
 INFECTED_WEIGHT = 1
 
@@ -138,7 +138,7 @@ def SEIQR_fit(data, pop):
     optimized_params = result.x
 
     return optimized_params.tolist()
-def SEIQDRP_fit(data, pop):
+def SEIQRDP_fit(data, pop):
 
     time = data['Date'].to_numpy()
     time = [i for i in range(len(time))]
@@ -169,7 +169,7 @@ def SEIQDRP_fit(data, pop):
         S0 = 1 - Q0 - E0 - R0 - D0 - I0
         params = params.tolist()
         ini_values = [S0, E0, I0, Q0, R0, D0, 0]
-        predicted_solution = solve_ode_SEIQDRP(time_points, ini_values + params)
+        predicted_solution = solve_ode_SEIQRDP(time_points, ini_values + params)
 
         SSQ = np.sum((quarantined - predicted_solution[:, 3]) ** 2)
         SSR = np.sum((recovered - predicted_solution[:, 4]) ** 2)

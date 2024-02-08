@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import minimize
 
-from solve_model import solve_ode_SEIR, solve_ode_SEIRP, solve_ode_SEIQR, solve_ode_SEIQDRP
+from solve_model import solve_ode_SEIR, solve_ode_SEIRP, solve_ode_SEIQR, solve_ode_SEIQRDP
 
 INFECTED_WEIGHT = 1
 
@@ -125,7 +125,7 @@ def SEIQR_fit(data, params):
     params['SEIQR']['lambda'] = optimized_params[3]
 
 
-def SEIQDRP_fit(data, params):
+def SEIQRDP_fit(data, params):
     time = data['Date'].to_numpy()
     time = [i for i in range(len(time))]
     confirmed = data['Total_Current_Positive_Cases'].to_numpy()
@@ -133,9 +133,9 @@ def SEIQDRP_fit(data, params):
     quarantined = data['Home_Confined'].to_numpy()
     dead = data['Dead'].to_numpy()
 
-    coef_guess = [params['SEIQDRP']['alpha'], params['SEIQDRP']['beta'], params['SEIQDRP']['sigma'],
-                  params['SEIQDRP']['gamma'], params['SEIQDRP']['l1'], params['SEIQDRP']['l2'], params['SEIQDRP']['l3'],
-                  params['SEIQDRP']['k1'], params['SEIQDRP']['k2'], params['SEIQDRP']['k3']]
+    coef_guess = [params['SEIQRDP']['alpha'], params['SEIQRDP']['beta'], params['SEIQRDP']['sigma'],
+                  params['SEIQRDP']['gamma'], params['SEIQRDP']['l1'], params['SEIQRDP']['l2'], params['SEIQRDP']['l3'],
+                  params['SEIQRDP']['k1'], params['SEIQRDP']['k2'], params['SEIQRDP']['k3']]
 
     bounds = [
         (0, 1),
@@ -159,7 +159,7 @@ def SEIQDRP_fit(data, params):
         S0 = 1 - Q0 - E0 - R0 - D0 - I0
         params = params.tolist()
         ini_values = [S0, E0, I0, Q0, R0, D0, 0]
-        predicted_solution = solve_ode_SEIQDRP(time_points, ini_values + params)
+        predicted_solution = solve_ode_SEIQRDP(time_points, ini_values + params)
 
         SSQ = np.sum((quarantined - predicted_solution[:, 3]) ** 2)
         SSR = np.sum((recovered - predicted_solution[:, 4]) ** 2)
@@ -173,13 +173,13 @@ def SEIQDRP_fit(data, params):
                       bounds=bounds)
     optimized_params = result.x
 
-    params['SEIQDRP']['alpha'] = optimized_params[0]
-    params['SEIQDRP']['beta'] = optimized_params[1]
-    params['SEIQDRP']['sigma'] = optimized_params[2]
-    params['SEIQDRP']['gamma'] = optimized_params[3]
-    params['SEIQDRP']['l1'] = optimized_params[4]
-    params['SEIQDRP']['l2'] = optimized_params[5]
-    params['SEIQDRP']['l3'] = optimized_params[6]
-    params['SEIQDRP']['k1'] = optimized_params[7]
-    params['SEIQDRP']['k2'] = optimized_params[8]
-    params['SEIQDRP']['k3'] = optimized_params[9]
+    params['SEIQRDP']['alpha'] = optimized_params[0]
+    params['SEIQRDP']['beta'] = optimized_params[1]
+    params['SEIQRDP']['sigma'] = optimized_params[2]
+    params['SEIQRDP']['gamma'] = optimized_params[3]
+    params['SEIQRDP']['l1'] = optimized_params[4]
+    params['SEIQRDP']['l2'] = optimized_params[5]
+    params['SEIQRDP']['l3'] = optimized_params[6]
+    params['SEIQRDP']['k1'] = optimized_params[7]
+    params['SEIQRDP']['k2'] = optimized_params[8]
+    params['SEIQRDP']['k3'] = optimized_params[9]

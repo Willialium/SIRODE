@@ -1,10 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from models import SEIR_test, SEIRP_test, SEIQR_test, SEIQDRP_test
-from matplotlib.widgets import Slider
+from models import SEIR_test, SEIRP_test, SEIQR_test, SEIQRDP_test, data
+from matplotlib.widgets import Slider, Button
 from models import scales, inis
 
 EXCLUDE = 'SP'
+
+global use_SEIQRDP
+use_SEIQRDP = False
 
 # Function to create sliders
 def create_slider(ax, label, valmin, valmax, valinit, callback):
@@ -21,7 +24,7 @@ def update_SEIR(x):
     scales['SEIR']['Xsigma'] = SEIR_sigmaSlider.val
     scales['SEIR']['Xgamma'] = SEIR_gammaSlider.val
 
-    SEIR_Update = SEIR_test()
+    SEIR_Update = SEIR_test(use_SEIQRDP)
     model_buffer = 0
     for i in range(len('SEIR') - len(EXCLUDE)):
         if 'SEIR'[i+model_buffer] in EXCLUDE:
@@ -37,7 +40,7 @@ def update_SEIRP(x):
     scales['SEIRP']['Xgamma'] = SEIRP_gammaSlider.val
     scales['SEIRP']['Xalpha'] = SEIRP_alphaSlider.val
 
-    SEIRP_Update = SEIRP_test()
+    SEIRP_Update = SEIRP_test(use_SEIQRDP)
     model_buffer = 0
     for i in range(len('SEIRP') - len(EXCLUDE)):
         if 'SEIRP'[i+model_buffer] in EXCLUDE:
@@ -54,7 +57,7 @@ def update_SEIQR(x):
     scales['SEIQR']['Xgamma'] = SEIQR_gammaSlider.val
     scales['SEIQR']['Xlaambda'] = SEIQR_lambdaSlider.val
 
-    SEIQR_Update = SEIQR_test()
+    SEIQR_Update = SEIQR_test(use_SEIQRDP)
     model_buffer = 0
     for i in range(len('SEIQR') - len(EXCLUDE)):
         if 'SEIQR'[i+model_buffer] in EXCLUDE:
@@ -65,19 +68,19 @@ def update_SEIQR(x):
     ax3.relim()
     ax3.autoscale_view()
     fig.canvas.draw_idle()
-def update_SEIQDRP(x):
-    scales['SEIQDRP']['Xbeta'] = SEIQDRP_betaSlider.val
-    scales['SEIQDRP']['Xsigma'] = SEIQDRP_sigmaSlider.val
-    scales['SEIQDRP']['Xgamma'] = SEIQDRP_gammaSlider.val
-    scales['SEIQDRP']['Xalpha'] = SEIQDRP_alphaSlider.val
+def update_SEIQRDP(x):
+    scales['SEIQRDP']['Xbeta'] = SEIQRDP_betaSlider.val
+    scales['SEIQRDP']['Xsigma'] = SEIQRDP_sigmaSlider.val
+    scales['SEIQRDP']['Xgamma'] = SEIQRDP_gammaSlider.val
+    scales['SEIQRDP']['Xalpha'] = SEIQRDP_alphaSlider.val
 
-    SEIQDRP_Update = SEIQDRP_test()
+    SEIQRDP_Update = SEIQRDP_test()
     model_buffer = 0
-    for i in range(len('SEIQDRP') - len(EXCLUDE)):
-        if 'SEIQDRP'[i+model_buffer] in EXCLUDE:
+    for i in range(len('SEIQRDP') - len(EXCLUDE)):
+        if 'SEIQRDP'[i+model_buffer] in EXCLUDE:
             model_buffer += 1
-        SEIQDRP_lines[i][0].set_ydata(SEIQDRP_Update[i+model_buffer])
-        SEIQDRP_lines[i][0].set_xdata(np.arange(0, len(SEIQDRP_Update[i+model_buffer])))
+        SEIQRDP_lines[i][0].set_ydata(SEIQRDP_Update[i+model_buffer])
+        SEIQRDP_lines[i][0].set_xdata(np.arange(0, len(SEIQRDP_Update[i+model_buffer])))
 
     ax4.relim()
     ax4.autoscale_view()
@@ -90,15 +93,30 @@ def update_all(x):
     update_SEIR(x)
     update_SEIRP(x)
     update_SEIQR(x)
-    update_SEIQDRP(x)
+    update_SEIQRDP(x)
 
+def button_press(x):
+    global use_SEIQRDP
+    use_SEIQRDP = not use_SEIQRDP
+    update_all(x)
 ########################
 ##### CREATE PLOTS #####
 ########################
+def create_real_plot(ax, name):
+    time = np.arange(0, len(data))
+    for cat in name:
+        if cat == 'I':
+            ax.scatter(time, data['Total_Current_Positive_Cases'], s=.4, color='red')
+        elif cat == 'R':
+            ax.scatter(time, data['Recovered'], s=.4, color='orange')
+        elif cat == 'D':
+            ax.scatter(time, data['Dead'], s=.4, color='black')
+        elif cat == 'Q':
+            ax.scatter(time, data['Home_Confined'], s=.4, color='blue')
 
 def create_SEIR_plot(ax, SEIR_test_result):
     lines = []
-    colors = ['blue', 'green', 'red', 'black']
+    colors = ['yellow', 'green', 'red', 'orange']
     for i in range(4):
         if 'SEIR'[i] not in EXCLUDE:
             lines.append(ax.plot(SEIR_test_result[i], color=colors[i], label='SEIR'[i]))
@@ -115,7 +133,7 @@ def create_SEIR_plot(ax, SEIR_test_result):
     return lines
 def create_SEIRP_plot(ax, SEIRP_test_result):
     lines = []
-    colors = ['blue', 'green', 'red', 'black', 'orange']
+    colors = ['yellow', 'green', 'red', 'orange', 'purple']
     for i in range(5):
         if 'SEIRP'[i] not in EXCLUDE:
             lines.append(ax.plot(SEIRP_test_result[i], color=colors[i], label='SEIRP'[i]))
@@ -130,7 +148,7 @@ def create_SEIRP_plot(ax, SEIRP_test_result):
     return lines
 def create_SEIQR_plot(ax, SEIQR_test_result):
     lines = []
-    colors = ['blue', 'green', 'red', 'black', 'orange']
+    colors = ['yellow', 'green', 'red', 'blue', 'orange']
     for i in range(5):
         if 'SEIQR'[i] not in EXCLUDE:
             lines.append(ax.plot(SEIQR_test_result[i], color=colors[i], label='SEIQR'[i]))
@@ -145,12 +163,12 @@ def create_SEIQR_plot(ax, SEIQR_test_result):
                 r'$\frac{dR}{dt} = \gamma Q$'
     ax.annotate(ode_latex, xy=(1, 1), xycoords='axes fraction', fontsize=14, ha='left', va='top')
     return lines
-def create_SEIQDRP_plot(ax, SEIQDRP_test_result):
+def create_SEIQRDP_plot(ax, SEIQRDP_test_result):
     lines = []
-    colors = ['blue', 'green', 'red', 'black', 'orange', 'purple', 'yellow']
+    colors = ['yellow', 'green', 'red', 'blue', 'orange', 'black', 'purple']
     for i in range(7):
-        if 'SEIQDRP'[i] not in EXCLUDE:
-            lines.append(ax.plot(SEIQDRP_test_result[i], color=colors[i], label='SEIQDRP'[i]))
+        if 'SEIQRDP'[i] not in EXCLUDE:
+            lines.append(ax.plot(SEIQRDP_test_result[i], color=colors[i], label='SEIQRDP'[i]))
     ax.legend()
     ax.set_xlabel('Time')
     ode_latex = r'$\frac{dS}{dt} = -\alpha S -\beta SI$' + '\n' + \
@@ -172,8 +190,12 @@ fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(12, 10), sharex=True
 SEIR_lines = create_SEIR_plot(ax1, SEIR_test())
 SEIRP_lines = create_SEIRP_plot(ax2, SEIRP_test())
 SEIQR_lines = create_SEIQR_plot(ax3, SEIQR_test())
-SEIQDRP_lines = create_SEIQDRP_plot(ax4, SEIQDRP_test())
+SEIQRDP_lines = create_SEIQRDP_plot(ax4, SEIQRDP_test())
 
+create_real_plot(ax1, 'SEIR')
+create_real_plot(ax2, 'SEIRP')
+create_real_plot(ax3, 'SEIQR')
+create_real_plot(ax4, 'SEIQRDP')
 ##########################
 ##### CREATE SLIDERS #####
 ##########################
@@ -193,15 +215,17 @@ SEIQR_sigmaSlider = create_slider(ax=fig.add_axes([0.1, 0.14, 0.26, 0.03]), labe
 SEIQR_gammaSlider = create_slider(ax=fig.add_axes([0.1, 0.11, 0.26, 0.03]), label='Xgamma', valmin=0.1, valmax=5, valinit=1, callback=update_SEIQR)
 SEIQR_lambdaSlider = create_slider(ax=fig.add_axes([0.1, 0.08, 0.26, 0.03]), label='Xlambda', valmin=0.1, valmax=5, valinit=1, callback=update_SEIQR)
 
-SEIQDRP_betaSlider = create_slider(ax=fig.add_axes([0.54, 0.17, 0.26, 0.03]), label='Xbeta', valmin=0.1, valmax=5, valinit=1, callback=update_SEIQDRP)
-SEIQDRP_sigmaSlider = create_slider(ax=fig.add_axes([0.54, 0.14, 0.26, 0.03]), label='Xsigma', valmin=0.1, valmax=5, valinit=1, callback=update_SEIQDRP)
-SEIQDRP_gammaSlider = create_slider(ax=fig.add_axes([0.54, 0.11, 0.26, 0.03]), label='Xgamma', valmin=0.1, valmax=5, valinit=1, callback=update_SEIQDRP)
-SEIQDRP_alphaSlider = create_slider(ax=fig.add_axes([0.54, 0.08, 0.26, 0.03]), label='Xalpha', valmin=0.1, valmax=5, valinit=1, callback=update_SEIQDRP)
+SEIQRDP_betaSlider = create_slider(ax=fig.add_axes([0.54, 0.17, 0.26, 0.03]), label='Xbeta', valmin=0.1, valmax=5, valinit=1, callback=update_SEIQRDP)
+SEIQRDP_sigmaSlider = create_slider(ax=fig.add_axes([0.54, 0.14, 0.26, 0.03]), label='Xsigma', valmin=0.1, valmax=5, valinit=1, callback=update_SEIQRDP)
+SEIQRDP_gammaSlider = create_slider(ax=fig.add_axes([0.54, 0.11, 0.26, 0.03]), label='Xgamma', valmin=0.1, valmax=5, valinit=1, callback=update_SEIQRDP)
+SEIQRDP_alphaSlider = create_slider(ax=fig.add_axes([0.54, 0.08, 0.26, 0.03]), label='Xalpha', valmin=0.1, valmax=5, valinit=1, callback=update_SEIQRDP)
 
 E0_slider = create_slider(ax=fig.add_axes([0.1, 0.97, 0.7, 0.03]), label='E0', valmin=0.00000001, valmax=0.001, valinit=inis['E0'], callback=update_all)
 I0_slider = create_slider(ax=fig.add_axes([0.1, 0.94, 0.7, 0.03]), label='I0', valmin=0.00000001, valmax=0.001, valinit=inis['I0'], callback=update_all)
 R0_slider = create_slider(ax=fig.add_axes([0.1, 0.91, 0.7, 0.03]), label='R0', valmin=0.000000001, valmax=0.001, valinit=inis['R0'], callback=update_all)
 time_slider = create_slider(ax=fig.add_axes([0.1, 0.88, 0.7, 0.03]), label='time', valmin=1, valmax=10, valinit=1, callback=update_all)
 
+button = Button(fig.add_axes([0.9, 0.9, 0.085, 0.085]), 'Use SEIQRDP\nparams', color='lightgrey', hovercolor='0.9')
+button.on_clicked(button_press)
 
 plt.show()

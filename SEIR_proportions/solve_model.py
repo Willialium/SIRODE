@@ -52,7 +52,7 @@ def solve_ode_SEIQR(t, params):
 
     return sol
 
-def solve_ode_SEIQDRP(t, params):
+def solve_ode_SEIQRDP(t, params):
     #print('solving with:', params)
     def odes(y, t, alpha, beta, sigma, gamma, l1, l2, l3, k1, k2, k3):
 
