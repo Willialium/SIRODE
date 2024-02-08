@@ -7,7 +7,7 @@ from models import scales, inis
 EXCLUDE = 'SP'
 
 global use_SEIQRDP
-use_SEIQRDP = False
+use_SEIQRDP = True
 
 # Function to create sliders
 def create_slider(ax, label, valmin, valmax, valinit, callback):
@@ -187,9 +187,9 @@ def create_SEIQRDP_plot(ax, SEIQRDP_test_result):
 
 fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(12, 10), sharex=True)
 
-SEIR_lines = create_SEIR_plot(ax1, SEIR_test())
-SEIRP_lines = create_SEIRP_plot(ax2, SEIRP_test())
-SEIQR_lines = create_SEIQR_plot(ax3, SEIQR_test())
+SEIR_lines = create_SEIR_plot(ax1, SEIR_test(use_SEIQRDP))
+SEIRP_lines = create_SEIRP_plot(ax2, SEIRP_test(use_SEIQRDP))
+SEIQR_lines = create_SEIQR_plot(ax3, SEIQR_test(use_SEIQRDP))
 SEIQRDP_lines = create_SEIQRDP_plot(ax4, SEIQRDP_test())
 
 create_real_plot(ax1, 'SEIR')

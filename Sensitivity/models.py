@@ -147,6 +147,7 @@ def SEIQR_test(use_SEIQRDP=False):
                       params['SEIQRDP']['sigma'] * scales['SEIQR']['Xsigma'],
                       params['SEIQRDP']['gamma'] * scales['SEIQR']['Xgamma'],
                       params['SEIQRDP']['lambda'] * scales['SEIQR']['Xlambda']]
+        print(fit_params)
 
     else:
         fit_params = [params['SEIQR']['beta'] * scales['SEIQR']['Xbeta'],
