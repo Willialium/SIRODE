@@ -35,7 +35,7 @@ quarantined = data['Home_Confined'].to_numpy()
 dead = data['Dead'].to_numpy()
 real_time = data['Date'].to_numpy()
 time = [i for i in range(len(real_time))]
-time_mult = 2
+time_mult = 1
 
 def SEIR_test():
 
@@ -306,11 +306,11 @@ def SEIRDC_test():
 
     plot()
 def test_ode():
-    #SEIR_test()
-    #SEIRP_test()
-    #SEIQR_test()
-    #SEIQDRP_test()
-    SEIR_2_test()
+    SEIR_test()
+    SEIRP_test()
+    SEIQR_test()
+    SEIQDRP_test()
+    #SEIR_2_test()
     #SEIRDC_test()
 
     plt.tight_layout()

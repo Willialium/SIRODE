@@ -35,7 +35,7 @@ quarantined = data['Home_Confined'].to_numpy() / N
 dead = data['Dead'].to_numpy() / N
 real_time = data['Date'].to_numpy()
 time = [i for i in range(len(real_time))]
-time_mult = 1
+time_mult = 10
 
 def SEIR_test():
 
@@ -48,6 +48,7 @@ def SEIR_test():
     ini = [S0, E0, I0, R0]
 
     fit_params = SEIR_fit(data, N)
+    print(fit_params)
     time2 = [t for t in range(len(time * time_mult))]
 
     ode_data = solve_ode_SEIR(time2, ini + fit_params)
@@ -63,8 +64,8 @@ def SEIR_test():
         #plt.xticks(np.arange(0, len(real_time), len(real_time)-1), [''] + [real_time[-1]], rotation=90)
         plt.xticks(np.arange(0, len(real_time), 5), real_time[::5], rotation=90)
 
-        plt.scatter(time, recovered, s=.4, label='Recovered_real', color='blue')
-        plt.plot(time2, ode_data[:, 3], label='Recovered', color='blue')
+        #plt.scatter(time, recovered, s=.4, label='Recovered_real', color='blue')
+        #plt.plot(time2, ode_data[:, 3], label='Recovered', color='blue')
         plt.scatter(time, confirmed, s=.4, label='Infected_real', color='orange')
         plt.plot(time2, ode_data[:, 2], label='Infected', color='orange')
         plt.plot(time2, ode_data[:, 1], label='Exposed', color='green')
@@ -91,6 +92,7 @@ def SEIRP_test():
     ini = [S0, E0, I0, R0, 0]
 
     fit_params = SEIRP_fit(data, N)
+    print(fit_params)
     time2 = [t for t in range(len(time * time_mult))]
 
     ode_data = solve_ode_SEIRP(time2, ini + fit_params)
@@ -105,8 +107,8 @@ def SEIRP_test():
         #plt.xticks(np.arange(0, len(real_time), len(real_time)-1), [''] + [real_time[-1]], rotation=90)
         plt.xticks(np.arange(0, len(real_time), 5), real_time[::5], rotation=90)
 
-        plt.scatter(time, recovered, s=.4, label='Recovered_real', color='blue')
-        plt.plot(time2, ode_data[:, 3], label='Recovered', color='blue')
+        #plt.scatter(time, recovered, s=.4, label='Recovered_real', color='blue')
+        #plt.plot(time2, ode_data[:, 3], label='Recovered', color='blue')
         plt.scatter(time, confirmed, s=.4, label='Infected_real', color='orange')
         plt.plot(time2, ode_data[:, 2], label='Infected', color='orange')
         plt.plot(time2, ode_data[:, 1], label='Exposed', color='green')
@@ -179,13 +181,11 @@ def SEIQDRP_test():
     D0 = dead[0]
     S0 = 1 - Q0 - E0 - R0 - D0 - I0
     ini = [S0, E0, I0, Q0, R0, D0, 0]
-    print(ini)
     fit_params = SEIQDRP_fit(data, N)
     print(fit_params)
     time2 = [t for t in range(len(time*time_mult))]
 
     ode_data = solve_ode_SEIQDRP(time2, ini + fit_params + [N])
-    print(time2[:3], len(time2))
 
     def plot():
         plt.subplot(2, 2, 4)
