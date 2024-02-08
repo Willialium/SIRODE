@@ -72,7 +72,7 @@ params = {
         'beta': .3611773188459532,
         'sigma': .708521695582455,
         'gamma': .03813449481479317,
-        'lambda': 0.661,
+        'lambda': 0.7652522426471923,
         'l1': .04180630024314114,
         'l2': .2823859135168591,
         'l3': 13.088725432836508,
@@ -105,9 +105,9 @@ def SEIR_test(use_SEIQRDP=False):
         fit_params = [params['SEIR']['beta'] * scales['SEIR']['Xbeta'],
                       params['SEIR']['sigma'] * scales['SEIR']['Xsigma'],
                       params['SEIR']['gamma'] * scales['SEIR']['Xgamma']]
-    print(use_SEIQRDP)
+    print(fit_params)
     ode_data = solve_ode_SEIR(time, ini + fit_params).T
-
+    print(fit_params)
     return ode_data
 
 
@@ -147,7 +147,6 @@ def SEIQR_test(use_SEIQRDP=False):
                       params['SEIQRDP']['sigma'] * scales['SEIQR']['Xsigma'],
                       params['SEIQRDP']['gamma'] * scales['SEIQR']['Xgamma'],
                       params['SEIQRDP']['lambda'] * scales['SEIQR']['Xlambda']]
-        print(fit_params)
 
     else:
         fit_params = [params['SEIQR']['beta'] * scales['SEIQR']['Xbeta'],
