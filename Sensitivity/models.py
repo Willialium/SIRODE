@@ -61,6 +61,7 @@ def SEIR_test():
     fit_params = [params['beta']*scales['SEIR']['Xbeta'], params['sigma']*scales['SEIR']['Xsigma'], params['gamma']*scales['SEIR']['Xgamma']]
 
     ode_data = solve_ode_SEIR(time, ini + fit_params).T
+
     return ode_data
 
 
