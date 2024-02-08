@@ -7,7 +7,7 @@ from models import scales, inis
 EXCLUDE = 'SP'
 
 global use_SEIQRDP
-use_SEIQRDP = True
+use_SEIQRDP = False
 
 # Function to create sliders
 def create_slider(ax, label, valmin, valmax, valinit, callback):
@@ -98,6 +98,10 @@ def update_all(x):
 def button_press(x):
     global use_SEIQRDP
     use_SEIQRDP = not use_SEIQRDP
+    if use_SEIQRDP:
+        button.label.set_text('Use fitted\ndata')
+    else:
+        button.label.set_text('Use SEIQRDP')
     update_all(x)
 ########################
 ##### CREATE PLOTS #####
