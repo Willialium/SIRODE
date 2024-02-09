@@ -4,16 +4,19 @@ from models import SEIR_test, SEIRP_test, SEIQR_test, SEIQRDP_test, data
 from matplotlib.widgets import Slider, Button
 from models import scales, inis
 
-EXCLUDE = 'S'
+EXCLUDE = 'SP'
 
 global use_SEIQRDP
 use_SEIQRDP = False
 
-# Function to create sliders
+# utility functions
 def create_slider(ax, label, valmin, valmax, valinit, callback):
     slider = Slider(ax=ax, label=label, valmin=valmin, valmax=valmax, valinit=valinit)
     slider.on_changed(callback)
     return slider
+def find_intersection(str1, str2):
+    return "".join(set(str1).intersection(set(str2)))
+
 
 #############################
 ##### UPDATE FUNCTIONS  #####
@@ -26,7 +29,9 @@ def update_SEIR(x):
 
     SEIR_Update = SEIR_test(use_SEIQRDP)
     model_buffer = 0
-    for i in range(len('SEIR') - len(EXCLUDE)):
+
+    for i in range(len('SEIR') - len(find_intersection('SEIR', EXCLUDE))):
+        print(i)
         if 'SEIR'[i+model_buffer] in EXCLUDE:
             model_buffer += 1
         SEIR_lines[i][0].set_ydata(SEIR_Update[i+model_buffer])
@@ -42,7 +47,7 @@ def update_SEIRP(x):
 
     SEIRP_Update = SEIRP_test(use_SEIQRDP)
     model_buffer = 0
-    for i in range(len('SEIRP') - len(EXCLUDE)):
+    for i in range(len('SEIRP') - len(find_intersection('SEIRP', EXCLUDE))):
         if 'SEIRP'[i+model_buffer] in EXCLUDE:
             model_buffer += 1
         SEIRP_lines[i][0].set_ydata(SEIRP_Update[i+model_buffer])
@@ -59,7 +64,7 @@ def update_SEIQR(x):
 
     SEIQR_Update = SEIQR_test(use_SEIQRDP)
     model_buffer = 0
-    for i in range(len('SEIQR') - len(EXCLUDE)):
+    for i in range(len('SEIQR') - len(find_intersection('SEIQR', EXCLUDE))):
         if 'SEIQR'[i+model_buffer] in EXCLUDE:
             model_buffer += 1
         SEIQR_lines[i][0].set_ydata(SEIQR_Update[i+model_buffer])
@@ -76,7 +81,7 @@ def update_SEIQRDP(x):
 
     SEIQRDP_Update = SEIQRDP_test()
     model_buffer = 0
-    for i in range(len('SEIQRDP') - len(EXCLUDE)):
+    for i in range(len('SEIQRDP') - len(find_intersection('SEIQRDP', EXCLUDE))):
         if 'SEIQRDP'[i+model_buffer] in EXCLUDE:
             model_buffer += 1
         SEIQRDP_lines[i][0].set_ydata(SEIQRDP_Update[i+model_buffer])
@@ -103,6 +108,8 @@ def button_press(x):
     else:
         button.label.set_text('Use SEIQRDP')
     update_all(x)
+
+
 ########################
 ##### CREATE PLOTS #####
 ########################
@@ -188,7 +195,6 @@ def create_SEIQRDP_plot(ax, SEIQRDP_test_result):
 #########################
 ##### CREATE FIGURE #####
 #########################
-
 fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(12, 10), sharex=True)
 
 SEIR_lines = create_SEIR_plot(ax1, SEIR_test(use_SEIQRDP))
@@ -200,10 +206,10 @@ create_real_plot(ax1, 'SEIR')
 create_real_plot(ax2, 'SEIRP')
 create_real_plot(ax3, 'SEIQR')
 create_real_plot(ax4, 'SEIQRDP')
+
 ##########################
 ##### CREATE SLIDERS #####
 ##########################
-
 plt.subplots_adjust(top=.88, bottom=.25, hspace=0.65, wspace=0.7, left=.1, right=.8)
 SEIR_betaSlider = create_slider(ax=fig.add_axes([0.1, 0.6, 0.26, 0.03]), label='Xbeta', valmin=0.1, valmax=5, valinit=1, callback=update_SEIR)
 SEIR_sigmaSlider = create_slider(ax=fig.add_axes([0.1, 0.57, 0.26, 0.03]), label='Xsigma', valmin=0.1, valmax=5, valinit=1, callback=update_SEIR)

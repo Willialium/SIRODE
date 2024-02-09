@@ -105,9 +105,7 @@ def SEIR_test(use_SEIQRDP=False):
         fit_params = [params['SEIR']['beta'] * scales['SEIR']['Xbeta'],
                       params['SEIR']['sigma'] * scales['SEIR']['Xsigma'],
                       params['SEIR']['gamma'] * scales['SEIR']['Xgamma']]
-    print(fit_params)
     ode_data = solve_ode_SEIR(time, ini + fit_params).T
-    print(fit_params)
     return ode_data
 
 

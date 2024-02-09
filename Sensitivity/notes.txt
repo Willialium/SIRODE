@@ -1,0 +1,9 @@
+The Q and I categories have very high correlation. They probably double count the same people, and shouldn't be considered separate categories
+ - But why then does the SEIQRDP fit both so well while treating them as separate categories?
+
+The SEIRP model fits the data well, but it suggests that after 20 days, 60%+ of the population is insusceptible. Which doesn't make much sense.
+ - But it still fits the data so well. Why?
+
+The parameters for the SEIQRDP model still make a complete period with the SEIR model, but it thinks that at the highest point, 60% of the population is infected.
+
+ The fitted parameters for the SEIR model do not look appripriate, but after 5x the amount of time, still make a complete cycle.
