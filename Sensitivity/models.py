@@ -11,8 +11,13 @@ data = data.groupby('Date').sum().reset_index()
 data[['Total_Current_Positive_Cases', 'Recovered', 'Home_Confined', 'Dead']] = data[['Total_Current_Positive_Cases',
                                                                                      'Recovered', 'Home_Confined',
                                                                                      'Dead']] / pop
+
+# First wave is 2020-03-01 to 2020-06-30
+# Second wave is 2020-10-01 to 2021-07-01
+### There is a spike at ~ 2021-02-30
+
 data = data[data['Date'] >= '2020-03-01']
-data = data[data['Date'] <= '2020-06-20']
+data = data[data['Date'] <= '2020-07-30']
 
 scales = {
     'time': 1,

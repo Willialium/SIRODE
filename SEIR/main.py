@@ -26,7 +26,7 @@ def plot():
     plt.show()
 
 data = data[data['Date'] >= '2020-03-01']
-data = data[data['Date'] <= '2020-06-20']
+data = data[data['Date'] <= '2020-09-20']
 
 N = 6e7
 confirmed = data['Total_Current_Positive_Cases'].to_numpy()
@@ -309,9 +309,9 @@ def test_ode():
     SEIR_test()
     SEIRP_test()
     SEIQR_test()
-    SEIQDRP_test()
+    #SEIQDRP_test()
     #SEIR_2_test()
-    #SEIRDC_test()
+    SEIRDC_test()
 
     plt.tight_layout()
     plt.show()
