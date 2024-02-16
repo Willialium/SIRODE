@@ -6,7 +6,7 @@ from models import SEIR_test, SEIRP_test, SEIQR_test, SEIQRDP_test, data
 from matplotlib.widgets import Slider, Button
 from models import scales, inis, params
 
-EXCLUDE = 'SP'
+EXCLUDE = 'SPR'
 base = 2
 
 global use_SEIQRDP
@@ -59,12 +59,13 @@ def update_SEIR(x, update=True):
     model_buffer = 0
 
     for i in range(len('SEIR') - len(find_intersection('SEIR', EXCLUDE))):
-        if 'SEIR'[i+model_buffer] in EXCLUDE:
+        while 'SEIR'[i+model_buffer] in EXCLUDE:
             model_buffer += 1
         SEIR_lines[i][0].set_ydata(SEIR_Update[i+model_buffer])
         SEIR_lines[i][0].set_xdata(np.arange(0, len(SEIR_Update[i+model_buffer])))
     ax1.relim()
     ax1.autoscale_view()
+    ax1.title.set_text(f'beta = {params["SEIR"]["beta"]*scales["SEIR"]["Xbeta"]:.2f}, sigma = {params["SEIR"]["sigma"]*scales["SEIR"]["Xsigma"]:.2f}, gamma = {params["SEIR"]["gamma"]*scales["SEIR"]["Xgamma"]:.2f}')
     fig.canvas.draw_idle()
 def update_SEIRP(x, update=True):
     scales['SEIRP']['Xbeta'] = base**SEIRP_betaSlider.val
@@ -76,13 +77,14 @@ def update_SEIRP(x, update=True):
     SEIRP_Update = SEIRP_test(use_SEIQRDP)
     model_buffer = 0
     for i in range(len('SEIRP') - len(find_intersection('SEIRP', EXCLUDE))):
-        if 'SEIRP'[i+model_buffer] in EXCLUDE:
+        while 'SEIRP'[i+model_buffer] in EXCLUDE:
             model_buffer += 1
         SEIRP_lines[i][0].set_ydata(SEIRP_Update[i+model_buffer])
         SEIRP_lines[i][0].set_xdata(np.arange(0, len(SEIRP_Update[i+model_buffer])))
 
     ax2.relim()
     ax2.autoscale_view()
+    ax2.title.set_text(f'alpha = {params["SEIRP"]["alpha"]*scales["SEIRP"]["Xalpha"]:.2f}, beta = {params["SEIRP"]["beta"]*scales["SEIRP"]["Xbeta"]:.2f}, sigma = {params["SEIRP"]["sigma"]*scales["SEIRP"]["Xsigma"]:.2f}, gamma = {params["SEIRP"]["gamma"]*scales["SEIRP"]["Xgamma"]:.2f}')
     fig.canvas.draw_idle()
 def update_SEIQR(x, update=True):
     scales['SEIQR']['Xbeta'] = base**SEIQR_betaSlider.val
@@ -94,13 +96,14 @@ def update_SEIQR(x, update=True):
     SEIQR_Update = SEIQR_test(use_SEIQRDP)
     model_buffer = 0
     for i in range(len('SEIQR') - len(find_intersection('SEIQR', EXCLUDE))):
-        if 'SEIQR'[i+model_buffer] in EXCLUDE:
+        while 'SEIQR'[i+model_buffer] in EXCLUDE:
             model_buffer += 1
         SEIQR_lines[i][0].set_ydata(SEIQR_Update[i+model_buffer])
         SEIQR_lines[i][0].set_xdata(np.arange(0, len(SEIQR_Update[i+model_buffer])))
 
     ax3.relim()
     ax3.autoscale_view()
+    ax3.title.set_text(f'beta = {params["SEIQR"]["beta"]*scales["SEIQR"]["Xbeta"]:.2f}, sigma = {params["SEIQR"]["sigma"]*scales["SEIQR"]["Xsigma"]:.2f}, gamma = {params["SEIQR"]["gamma"]*scales["SEIQR"]["Xgamma"]:.2f}, lambda = {params["SEIQR"]["lambda"]*scales["SEIQR"]["Xlambda"]:.2f}')
     fig.canvas.draw_idle()
 def update_SEIQRDP(x, update=True):
     scales['SEIQRDP']['Xbeta'] = base**SEIQRDP_betaSlider.val
@@ -112,10 +115,12 @@ def update_SEIQRDP(x, update=True):
     SEIQRDP_Update = SEIQRDP_test()
     model_buffer = 0
     for i in range(len('SEIQRDP') - len(find_intersection('SEIQRDP', EXCLUDE))):
-        if 'SEIQRDP'[i+model_buffer] in EXCLUDE:
+        while 'SEIQRDP'[i+model_buffer] in EXCLUDE:
             model_buffer += 1
         SEIQRDP_lines[i][0].set_ydata(SEIQRDP_Update[i+model_buffer])
         SEIQRDP_lines[i][0].set_xdata(np.arange(0, len(SEIQRDP_Update[i+model_buffer])))
+
+    ax4.title.set_text(f'alpha = {params["SEIQRDP"]["alpha"]*scales["SEIQRDP"]["Xalpha"]:.2f}, beta = {params["SEIQRDP"]["beta"]*scales["SEIQRDP"]["Xbeta"]:.2f}, sigma = {params["SEIQRDP"]["sigma"]*scales["SEIQRDP"]["Xsigma"]:.2f}, gamma = {params["SEIQRDP"]["gamma"]*scales["SEIQRDP"]["Xgamma"]:.2f}, lambda = {params["SEIQRDP"]["lambda"]:.2f}')
 
     ax4.relim()
     ax4.autoscale_view()
@@ -123,7 +128,6 @@ def update_SEIQRDP(x, update=True):
 def update_all(x):
     inis['E0'] = E0_slider.val
     inis['I0'] = I0_slider.val
-    inis['R0'] = R0_slider.val
     scales['time'] = int(time_slider.val)
     update_SEIR(x, update=False)
     update_SEIRP(x, update=False)
@@ -163,7 +167,7 @@ def create_SEIR_plot(ax, SEIR_test_result):
     for i in range(4):
         if 'SEIR'[i] not in EXCLUDE:
             lines.append(ax.plot(SEIR_test_result[i], color=colors[i], label='SEIR'[i]))
-
+    ax.title.set_text(f'beta = {params["SEIR"]["beta"]*scales["SEIR"]["Xbeta"]:.2f}, sigma = {params["SEIR"]["sigma"]*scales["SEIR"]["Xsigma"]:.2f}, gamma = {params["SEIR"]["gamma"]*scales["SEIR"]["Xgamma"]:.2f}')
     ax.set_ylabel('Proportion in\neach compartment')
     ax.legend()
 
@@ -181,6 +185,7 @@ def create_SEIRP_plot(ax, SEIRP_test_result):
         if 'SEIRP'[i] not in EXCLUDE:
             lines.append(ax.plot(SEIRP_test_result[i], color=colors[i], label='SEIRP'[i]))
 
+    ax.title.set_text(f'alpha = {params["SEIRP"]["alpha"]*scales["SEIRP"]["Xalpha"]:.2f}, beta = {params["SEIRP"]["beta"]*scales["SEIRP"]["Xbeta"]:.2f}, sigma = {params["SEIRP"]["sigma"]*scales["SEIRP"]["Xsigma"]:.2f}, gamma = {params["SEIRP"]["gamma"]*scales["SEIRP"]["Xgamma"]:.2f}')
     ax.legend()
     ode_latex = r'$\frac{dS}{dt} = -\alpha S -\beta SI$' + '\n' + \
                 r'$\frac{dE}{dt} = \beta SI - \sigma E$' + '\n' + \
@@ -204,6 +209,7 @@ def create_SEIQR_plot(ax, SEIQR_test_result):
                 r'$\frac{dI}{dt} = \sigma E - \delta I$' + '\n' + \
                 r'$\frac{dQ}{dt} = \delta I - \gamma Q$' + '\n' + \
                 r'$\frac{dR}{dt} = \gamma Q$'
+    ax.title.set_text(f'beta = {params["SEIQR"]["beta"]*scales["SEIQR"]["Xbeta"]:.2f}, sigma = {params["SEIQR"]["sigma"]*scales["SEIQR"]["Xsigma"]:.2f}, gamma = {params["SEIQR"]["gamma"]*scales["SEIQR"]["Xgamma"]:.2f}, lambda = {params["SEIQR"]["lambda"]:.2f}')
     ax.annotate(ode_latex, xy=(1, 1), xycoords='axes fraction', fontsize=14, ha='left', va='top')
     return lines
 def create_SEIQRDP_plot(ax, SEIQRDP_test_result):
@@ -221,6 +227,8 @@ def create_SEIQRDP_plot(ax, SEIQRDP_test_result):
                 r'$\frac{dR}{dt} = \lambda(t) Q$' + '\n' + \
                 r'$\frac{dD}{dt} = \kappa(t) Q$' + '\n' + \
                 r'$\frac{dP}{dt} = \alpha S$'
+    ax4.title.set_text(f'alpha = {params["SEIQRDP"]["alpha"]*scales["SEIQRDP"]["Xalpha"]:.2f}, beta = {params["SEIQRDP"]["beta"]*scales["SEIQRDP"]["Xbeta"]:.2f}, sigma = {params["SEIQRDP"]["sigma"]*scales["SEIQRDP"]["Xsigma"]:.2f}, gamma = {params["SEIQRDP"]["gamma"]*scales["SEIQRDP"]["Xgamma"]:.2f}, lambda = {params["SEIQRDP"]["lambda"]:.2f}')
+
     ax.annotate(ode_latex, xy=(1, 1), xycoords='axes fraction', fontsize=14, ha='left', va='top')
     return lines
 update_params()
@@ -243,32 +251,32 @@ create_real_plot(ax4, 'SEIQRDP')
 ##########################
 ##### CREATE SLIDERS #####
 ##########################
-plt.subplots_adjust(top=.88, bottom=.25, hspace=0.65, wspace=0.7, left=.1, right=.8)
-SEIR_betaSlider = create_slider(ax=fig.add_axes([0.1, 0.6, 0.26, 0.03]), label='Xbeta', valmin=-1, valmax=2, valinit=0, callback=update_SEIR)
-SEIR_sigmaSlider = create_slider(ax=fig.add_axes([0.1, 0.57, 0.26, 0.03]), label='Xsigma', valmin=-1, valmax=2, valinit=0, callback=update_SEIR)
-SEIR_gammaSlider = create_slider(ax=fig.add_axes([0.1, 0.54, 0.26, 0.03]), label='Xgamma', valmin=-1, valmax=2, valinit=0, callback=update_SEIR)
+plt.subplots_adjust(top=.85, bottom=.18, hspace=0.7, wspace=0.7, left=.1, right=.8)
+SEIR_betaSlider = create_slider(ax=fig.add_axes([0.1, 0.56, 0.26, 0.03]), label='Xbeta', valmin=-2, valmax=2, valinit=0, callback=update_SEIR)
+SEIR_sigmaSlider = create_slider(ax=fig.add_axes([0.1, 0.53, 0.26, 0.03]), label='Xsigma', valmin=-2, valmax=2, valinit=0, callback=update_SEIR)
+SEIR_gammaSlider = create_slider(ax=fig.add_axes([0.1, 0.5, 0.26, 0.03]), label='Xgamma', valmin=-2, valmax=2, valinit=0, callback=update_SEIR)
 
-SEIRP_betaSlider = create_slider(ax=fig.add_axes([0.54, 0.6, 0.26, 0.03]), label='Xbeta', valmin=-1, valmax=2, valinit=0, callback=update_SEIRP)
-SEIRP_sigmaSlider = create_slider(ax=fig.add_axes([0.54, 0.57, 0.26, 0.03]), label='Xsigma', valmin=-1, valmax=2, valinit=0, callback=update_SEIRP)
-SEIRP_gammaSlider = create_slider(ax=fig.add_axes([0.54, 0.54, 0.26, 0.03]), label='Xgamma', valmin=-1, valmax=2, valinit=0, callback=update_SEIRP)
-SEIRP_alphaSlider = create_slider(ax=fig.add_axes([0.54, 0.51, 0.26, 0.03]), label='Xalpha', valmin=-1, valmax=2, valinit=0, callback=update_SEIRP)
+SEIRP_betaSlider = create_slider(ax=fig.add_axes([0.54, 0.56, 0.26, 0.03]), label='Xbeta', valmin=-2, valmax=2, valinit=0, callback=update_SEIRP)
+SEIRP_sigmaSlider = create_slider(ax=fig.add_axes([0.54, 0.53, 0.26, 0.03]), label='Xsigma', valmin=-2, valmax=2, valinit=0, callback=update_SEIRP)
+SEIRP_gammaSlider = create_slider(ax=fig.add_axes([0.54, 0.5, 0.26, 0.03]), label='Xgamma', valmin=-2, valmax=2, valinit=0, callback=update_SEIRP)
+SEIRP_alphaSlider = create_slider(ax=fig.add_axes([0.54, 0.47, 0.26, 0.03]), label='Xalpha', valmin=-2, valmax=2, valinit=0, callback=update_SEIRP)
 
-SEIQR_betaSlider = create_slider(ax=fig.add_axes([0.1, 0.17, 0.26, 0.03]), label='Xbeta', valmin=-1, valmax=2, valinit=0, callback=update_SEIQR)
-SEIQR_sigmaSlider = create_slider(ax=fig.add_axes([0.1, 0.14, 0.26, 0.03]), label='Xsigma', valmin=-1, valmax=2, valinit=0, callback=update_SEIQR)
-SEIQR_gammaSlider = create_slider(ax=fig.add_axes([0.1, 0.11, 0.26, 0.03]), label='Xgamma', valmin=-1, valmax=2, valinit=0, callback=update_SEIQR)
-SEIQR_lambdaSlider = create_slider(ax=fig.add_axes([0.1, 0.08, 0.26, 0.03]), label='Xlambda', valmin=-1, valmax=2, valinit=0, callback=update_SEIQR)
+SEIQR_betaSlider = create_slider(ax=fig.add_axes([0.1, 0.11, 0.26, 0.03]), label='Xbeta', valmin=-2, valmax=2, valinit=0, callback=update_SEIQR)
+SEIQR_sigmaSlider = create_slider(ax=fig.add_axes([0.1, 0.08, 0.26, 0.03]), label='Xsigma', valmin=-2, valmax=2, valinit=0, callback=update_SEIQR)
+SEIQR_gammaSlider = create_slider(ax=fig.add_axes([0.1, 0.05, 0.26, 0.03]), label='Xgamma', valmin=-2, valmax=2, valinit=0, callback=update_SEIQR)
+SEIQR_lambdaSlider = create_slider(ax=fig.add_axes([0.1, 0.02, 0.26, 0.03]), label='Xlambda', valmin=-2, valmax=2, valinit=0, callback=update_SEIQR)
 
-SEIQRDP_betaSlider = create_slider(ax=fig.add_axes([0.54, 0.17, 0.26, 0.03]), label='Xbeta', valmin=-1, valmax=2, valinit=0, callback=update_SEIQRDP)
-SEIQRDP_sigmaSlider = create_slider(ax=fig.add_axes([0.54, 0.14, 0.26, 0.03]), label='Xsigma', valmin=-1, valmax=2, valinit=0, callback=update_SEIQRDP)
-SEIQRDP_gammaSlider = create_slider(ax=fig.add_axes([0.54, 0.11, 0.26, 0.03]), label='Xgamma', valmin=-1, valmax=2, valinit=0, callback=update_SEIQRDP)
-SEIQRDP_alphaSlider = create_slider(ax=fig.add_axes([0.54, 0.08, 0.26, 0.03]), label='Xalpha', valmin=-1, valmax=2, valinit=0, callback=update_SEIQRDP)
+SEIQRDP_betaSlider = create_slider(ax=fig.add_axes([0.54, 0.11, 0.26, 0.03]), label='Xbeta', valmin=-2, valmax=2, valinit=0, callback=update_SEIQRDP)
+SEIQRDP_sigmaSlider = create_slider(ax=fig.add_axes([0.54, 0.08, 0.26, 0.03]), label='Xsigma', valmin=-2, valmax=2, valinit=0, callback=update_SEIQRDP)
+SEIQRDP_gammaSlider = create_slider(ax=fig.add_axes([0.54, 0.05, 0.26, 0.03]), label='Xgamma', valmin=-2, valmax=2, valinit=0, callback=update_SEIQRDP)
+SEIQRDP_alphaSlider = create_slider(ax=fig.add_axes([0.54, 0.02, 0.26, 0.03]), label='Xalpha', valmin=-2, valmax=2, valinit=0, callback=update_SEIQRDP)
 
 E0_slider = create_slider(ax=fig.add_axes([0.1, 0.97, 0.7, 0.03]), label='E0', valmin=0.00000001, valmax=0.001, valinit=inis['E0'], callback=update_all)
 I0_slider = create_slider(ax=fig.add_axes([0.1, 0.94, 0.7, 0.03]), label='I0', valmin=0.00000001, valmax=0.001, valinit=inis['I0'], callback=update_all)
-R0_slider = create_slider(ax=fig.add_axes([0.1, 0.91, 0.7, 0.03]), label='R0', valmin=0.000000001, valmax=0.001, valinit=inis['R0'], callback=update_all)
-time_slider = create_slider(ax=fig.add_axes([0.1, 0.88, 0.7, 0.03]), label='time', valmin=1, valmax=10, valinit=1, callback=update_all)
+time_slider = create_slider(ax=fig.add_axes([0.1, 0.91, 0.7, 0.03]), label='time', valmin=1, valmax=10, valinit=1, callback=update_all)
 
 button = Button(fig.add_axes([0.9, 0.9, 0.085, 0.085]), 'Use SEIQRDP\nparams', color='lightgrey', hovercolor='0.9')
 button.on_clicked(button_press)
 
+fig.canvas.manager.full_screen_toggle()
 plt.show()
