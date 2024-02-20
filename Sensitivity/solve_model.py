@@ -1,8 +1,52 @@
 from scipy.integrate import odeint
 import numpy as np
 
+def solve_SIS(t, params):
+    def odes(y, t, beta,):
+        S, I = y
 
-def solve_ode_SEIR(t, params):
+        dydt = [
+            -beta * S * I,  # Susceptible cases
+            beta * S * I  # Infectious cases
+        ]
+        return dydt
+
+    y = [params[0], params[1]]
+    sol = odeint(odes, y, t, (params[2],))
+
+    return sol
+
+def solve_SIR(t, params):
+    def odes(y, t, beta, gamma):
+        S, I, R = y
+
+        dydt = [
+            -beta * S * I,  # Susceptible cases
+            beta * I * S - gamma * I,  # Infectious cases
+            gamma * I,  # Recovered cases
+        ]
+        return dydt
+    y = [params[0], params[1], params[2]]
+    sol = odeint(odes, y, t, (params[3], params[4]))
+
+    return sol
+
+def solve_SEI(t, params):
+    def odes(y, t, beta, sigma):
+        S, E, I, = y
+
+        dydt = [
+            -beta * S * I,  # Susceptible cases
+            beta * I * S - sigma * E,  # Exposed cases
+            sigma * E  # Infectious cases
+        ]
+        return dydt
+    y = [params[0], params[1], params[2]]
+    sol = odeint(odes, y, t, (params[3], params[4]))
+
+    return sol
+
+def solve_SEIR(t, params):
     def odes(y, t, beta, sigma, gamma):
         S, E, I, R = y
 
@@ -20,7 +64,7 @@ def solve_ode_SEIR(t, params):
     return sol
 
 
-def solve_ode_SEIRP(t, params):
+def solve_SEIRP(t, params):
     def odes(y, t, alpha, beta, sigma, gamma):
         S, E, I, R, P = y
 
@@ -39,7 +83,7 @@ def solve_ode_SEIRP(t, params):
     return sol
 
 
-def solve_ode_SEIQR(t, params):
+def solve_SEIQR(t, params):
     def odes(y, t, beta, sigma, gamma, laambda):
         S, E, I, Q, R = y
 
@@ -58,7 +102,7 @@ def solve_ode_SEIQR(t, params):
     return sol
 
 
-def solve_ode_SEIQRDP(t, params):
+def solve_SEIQRDP(t, params):
     # print('solving with:', params)
     def odes(y, t, alpha, beta, sigma, gamma, l1, l2, l3, k1, k2, k3):
         S, E, I, Q, R, D, P = y

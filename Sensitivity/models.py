@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
 
-from solve_model import solve_ode_SEIR, solve_ode_SEIRP, solve_ode_SEIQR, solve_ode_SEIQRDP
-from tuneModel import SEIR_fit, SEIRP_fit, SEIQR_fit, SEIQRDP_fit
+from solve_model import solve_SIS, solve_SIR, solve_SEI, solve_SEIR, solve_SEIRP, solve_SEIQR, solve_SEIQRDP
+from tuneModel import SIS_fit, SIR_fit, SEI_fit, SEIR_fit, SEIRP_fit, SEIQR_fit, SEIQRDP_fit
 
 pop = 6e7
 data = pd.read_csv('../combined_data.csv')[
@@ -21,6 +21,17 @@ data = data[data['Date'] <= '2020-07-30']
 
 scales = {
     'time': 1,
+    'SIS': {
+        'Xbeta': 1
+    },
+    'SIR': {
+        'Xbeta': 1,
+        'Xgamma': 1
+    },
+    'SEI': {
+        'Xbeta': 1,
+        'Xsigma': 1
+    },
     'SEIR': {
         'Xbeta': 1,
         'Xsigma': 1,
@@ -55,6 +66,17 @@ inis = {
 }
 
 params = {
+    'SIS': {
+        'beta': 0.14566402868860248
+    },
+    'SIR': {
+        'beta': 0.14566402868860248,
+        'gamma': 0.1190359988506418
+    },
+    'SEI': {
+        'beta': 0.14566402868860248,
+        'sigma': 15.760004176832581
+    },
     'SEIR': {
         'beta': 0.14566402868860248,
         'sigma': 15.760004176832581,
@@ -87,6 +109,10 @@ params = {
     }
 
 }
+
+SIS_fit(data, params)
+SIR_fit(data, params)
+SEI_fit(data, params)
 SEIR_fit(data, params)
 SEIRP_fit(data, params)
 SEIQR_fit(data, params)
@@ -94,6 +120,52 @@ SEIQRDP_fit(data, params)
 
 time_interval = len(data['Date'])
 
+def SIS_test(use_SEIQRDP=False):
+    time = np.arange(0, time_interval * scales['time'])
+
+    S0 = 1 - inis['I0']
+
+    ini = [S0, inis['I0']]
+    fit_params = []
+    if use_SEIQRDP:
+        fit_params = [params['SEIQDRP']['beta'] * scales['SIS']['Xbeta']]
+    else:
+        fit_params = [params['SIS']['beta'] * scales['SIS']['Xbeta']]
+    print(fit_params)
+    ode_data = solve_SIS(time, ini + fit_params).T
+
+    return ode_data
+def SIR_test(use_SEIQRDP=False):
+    time = np.arange(0, time_interval * scales['time'])
+
+    S0 = 1 - inis['I0'] - inis['R0']
+    ini = [S0, inis['I0'], inis['R0']]
+
+    fit_params = []
+    if use_SEIQRDP:
+        fit_params = [params['SEIQDRP']['beta'] * scales['SIR']['Xbeta'],
+                      params['SEIQDRP']['gamma'] * scales['SIR']['Xgamma']]
+    else:
+        fit_params = [params['SEI']['beta'] * scales['SEI']['Xbeta'], params['SEI']['sigma'] * scales['SEI']['Xsigma']]
+    ode_data = solve_SEI(time, ini + fit_params).T
+
+    return ode_data
+
+def SEI_test(use_SEIQRDP=False):
+    time = np.arange(0, time_interval * scales['time'])
+
+    S0 = 1 - inis['I0'] - inis['E0']
+    ini = [S0, inis['E0'], inis['I0']]
+
+    fit_params = []
+    if use_SEIQRDP:
+        fit_params = [params['SEIQDRP']['beta'] * scales['SIR']['Xbeta'],
+                      params['SEIQDRP']['gamma'] * scales['SIR']['Xgamma']]
+    else:
+        fit_params = [params['SIR']['beta'] * scales['SIR']['Xbeta'], params['SIR']['gamma'] * scales['SIR']['Xgamma']]
+    ode_data = solve_SIR(time, ini + fit_params).T
+
+    return ode_data
 
 def SEIR_test(use_SEIQRDP=False):
     time = np.arange(0, time_interval * scales['time'])
@@ -110,7 +182,7 @@ def SEIR_test(use_SEIQRDP=False):
         fit_params = [params['SEIR']['beta'] * scales['SEIR']['Xbeta'],
                       params['SEIR']['sigma'] * scales['SEIR']['Xsigma'],
                       params['SEIR']['gamma'] * scales['SEIR']['Xgamma']]
-    ode_data = solve_ode_SEIR(time, ini + fit_params).T
+    ode_data = solve_SEIR(time, ini + fit_params).T
     return ode_data
 
 
@@ -133,7 +205,7 @@ def SEIRP_test(use_SEIQRDP=False):
                       params['SEIRP']['sigma'] * scales['SEIRP']['Xsigma'],
                       params['SEIRP']['gamma'] * scales['SEIRP']['Xgamma']]
 
-    ode_data = solve_ode_SEIRP(time, ini + fit_params).T
+    ode_data = solve_SEIRP(time, ini + fit_params).T
 
     return ode_data
 
@@ -156,10 +228,9 @@ def SEIQR_test(use_SEIQRDP=False):
                       params['SEIQR']['sigma'] * scales['SEIQR']['Xsigma'],
                       params['SEIQR']['gamma'] * scales['SEIQR']['Xgamma'],
                       params['SEIQR']['lambda'] * scales['SEIQR']['Xlambda']]
-    ode_data = solve_ode_SEIQR(time, ini + fit_params).T
+    ode_data = solve_SEIQR(time, ini + fit_params).T
 
     return ode_data
-
 
 def SEIQRDP_test():
     time = np.arange(0, time_interval * scales['time'])
@@ -174,6 +245,6 @@ def SEIQRDP_test():
                   params['SEIQRDP']['l1'], params['SEIQRDP']['l2'], params['SEIQRDP']['l3'],
                   params['SEIQRDP']['k1'], params['SEIQRDP']['k2'], params['SEIQRDP']['k3']]
 
-    ode_data = solve_ode_SEIQRDP(time, ini + fit_params).T
+    ode_data = solve_SEIQRDP(time, ini + fit_params).T
 
     return ode_data

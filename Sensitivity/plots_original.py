@@ -6,7 +6,7 @@ from models import SEIR_test, SEIRP_test, SEIQR_test, SEIQRDP_test, data
 from matplotlib.widgets import Slider, Button
 from models import scales, inis, params
 
-EXCLUDE = 'SPR'
+EXCLUDE = 'SP'
 base = 2
 
 global use_SEIQRDP

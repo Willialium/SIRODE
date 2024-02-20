@@ -3,9 +3,97 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import minimize
 
-from solve_model import solve_ode_SEIR, solve_ode_SEIRP, solve_ode_SEIQR, solve_ode_SEIQRDP
+from solve_model import solve_SIS, solve_SIR, solve_SEIR, solve_SEIRP, solve_SEIQR, solve_SEIQRDP
 
 INFECTED_WEIGHT = 1
+
+def SIS_fit(data, params):
+    time = data['Date'].to_numpy()
+    time = [i for i in range(len(time))]
+    confirmed = data['Total_Current_Positive_Cases'].to_numpy()
+
+    coef_guess = [params['SIS']['beta']]
+    bounds = [
+        (0, 10),
+    ]
+    def objective_function(params, time_points, confirmed):
+        I0 = confirmed[0]
+        S0 = 1 - I0
+        params = params.tolist()
+        ini_values = [S0, I0]
+        predicted_solution = solve_SIS(time_points, ini_values + params)
+
+        SSI = np.sum((confirmed - predicted_solution[:, 1]) ** 2) * INFECTED_WEIGHT / len(confirmed)
+
+        loss = SSI
+        return loss
+
+    result = minimize(objective_function, coef_guess, args=(time, confirmed,), bounds=bounds)
+    optimized_params = result.x
+
+    params['SIS']['beta'] = optimized_params[0]
+
+def SIR_fit(data, params):
+    time = data['Date'].to_numpy()
+    time = [i for i in range(len(time))]
+    confirmed = data['Total_Current_Positive_Cases'].to_numpy()
+    recovered = data['Recovered'].to_numpy()
+
+    coef_guess = [params['SIR']['beta'], params['SIR']['gamma']]
+    bounds = [
+        (0, 10),
+        (0, 10),
+    ]
+
+    def objective_function(params, time_points, confirmed, recovered):
+        I0 = confirmed[0]
+        R0 = recovered[0]
+        S0 = 1 - I0 - R0
+        params = params.tolist()
+        ini_values = [S0, I0, R0]
+        predicted_solution = solve_SIR(time_points, ini_values + params)
+
+        SSI = np.sum((confirmed - predicted_solution[:, 1]) ** 2) * INFECTED_WEIGHT / len(confirmed)
+        SSR = np.sum((recovered - predicted_solution[:, 2]) ** 2) / len(recovered)
+
+        loss = SSI + SSR
+        return loss
+
+    result = minimize(objective_function, coef_guess, args=(time, confirmed, recovered), bounds=bounds)
+    optimized_params = result.x
+
+    params['SIR']['beta'] = optimized_params[0]
+    params['SIR']['gamma'] = optimized_params[1]
+
+def SEI_fit(data, params):
+    time = data['Date'].to_numpy()
+    time = [i for i in range(len(time))]
+    confirmed = data['Total_Current_Positive_Cases'].to_numpy()
+
+    coef_guess = [params['SEI']['beta'], params['SEI']['sigma']]
+    bounds = [
+        (0, 10),
+        (0, 10),
+    ]
+
+    def objective_function(params, time_points, confirmed):
+        I0 = confirmed[0]
+        E0 = I0
+        S0 = 1 - I0 - E0
+        params = params.tolist()
+        ini_values = [S0, E0, I0]
+        predicted_solution = solve_SIR(time_points, ini_values + params)
+
+        SSI = np.sum((confirmed - predicted_solution[:, 2]) ** 2) * INFECTED_WEIGHT / len(confirmed)
+
+        loss = SSI
+        return loss
+
+    result = minimize(objective_function, coef_guess, args=(time, confirmed), bounds=bounds)
+    optimized_params = result.x
+
+    params['SEI']['beta'] = optimized_params[0]
+    params['SEI']['sigma'] = optimized_params[1]
 
 
 def SEIR_fit(data, params):
@@ -20,7 +108,6 @@ def SEIR_fit(data, params):
         (0, 30),
         (0, 1)
     ]
-
     def objective_function(params, time_points, confirmed, recovered):
         I0 = confirmed[0]
         E0 = confirmed[0]
@@ -28,7 +115,7 @@ def SEIR_fit(data, params):
         S0 = 1 - E0 - I0 - R0
         params = params.tolist()
         ini_values = [S0, E0, I0, R0]
-        predicted_solution = solve_ode_SEIR(time_points, ini_values + params)
+        predicted_solution = solve_SEIR(time_points, ini_values + params)
 
         SSI = np.sum((confirmed - predicted_solution[:, 2]) ** 2) * INFECTED_WEIGHT / len(confirmed)
         SSR = np.sum((recovered - predicted_solution[:, 3]) ** 2) / len(recovered)
@@ -66,7 +153,7 @@ def SEIRP_fit(data, params):
         S0 = 1 - E0 - I0 - R0
         params = params.tolist()
         ini_values = [S0, E0, I0, R0, 0]
-        predicted_solution = solve_ode_SEIRP(time_points, ini_values + params)
+        predicted_solution = solve_SEIRP(time_points, ini_values + params)
 
         SSI = np.sum((confirmed - predicted_solution[:, 2]) ** 2) * INFECTED_WEIGHT / len(confirmed)
         SSR = np.sum((recovered - predicted_solution[:, 3]) ** 2) / len(recovered)
@@ -108,7 +195,7 @@ def SEIQR_fit(data, params):
         S0 = 1 - E0 - I0 - R0 - Q0
         params = params.tolist()
         ini_values = [S0, E0, I0, Q0, R0]
-        predicted_solution = solve_ode_SEIQR(time_points, ini_values + params)
+        predicted_solution = solve_SEIQR(time_points, ini_values + params)
         SSI = np.sum((confirmed - predicted_solution[:, 2]) ** 2) * INFECTED_WEIGHT / len(confirmed)
         SSR = np.sum((recovered - predicted_solution[:, 4]) ** 2) / len(recovered)
         SSQ = np.sum((quarantined - predicted_solution[:, 3]) ** 2) / len(quarantined)
@@ -159,7 +246,7 @@ def SEIQRDP_fit(data, params):
         S0 = 1 - Q0 - E0 - R0 - D0 - I0
         params = params.tolist()
         ini_values = [S0, E0, I0, Q0, R0, D0, 0]
-        predicted_solution = solve_ode_SEIQRDP(time_points, ini_values + params)
+        predicted_solution = solve_SEIQRDP(time_points, ini_values + params)
 
         SSQ = np.sum((quarantined - predicted_solution[:, 3]) ** 2)
         SSR = np.sum((recovered - predicted_solution[:, 4]) ** 2)
