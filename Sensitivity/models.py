@@ -131,24 +131,24 @@ def SIS_test(use_SEIQRDP=False):
         fit_params = [params['SEIQDRP']['beta'] * scales['SIS']['Xbeta']]
     else:
         fit_params = [params['SIS']['beta'] * scales['SIS']['Xbeta']]
-    print(fit_params)
     ode_data = solve_SIS(time, ini + fit_params).T
 
     return ode_data
+global x
+x = 1
 def SIR_test(use_SEIQRDP=False):
-    time = np.arange(0, time_interval * scales['time'])
-
+    global x
+    time = np.arange(time_interval * scales['time'])
     S0 = 1 - inis['I0'] - inis['R0']
     ini = [S0, inis['I0'], inis['R0']]
-
-    fit_params = []
     if use_SEIQRDP:
         fit_params = [params['SEIQDRP']['beta'] * scales['SIR']['Xbeta'],
                       params['SEIQDRP']['gamma'] * scales['SIR']['Xgamma']]
     else:
-        fit_params = [params['SEI']['beta'] * scales['SEI']['Xbeta'], params['SEI']['sigma'] * scales['SEI']['Xsigma']]
-    ode_data = solve_SEI(time, ini + fit_params).T
-
+        fit_params = [params['SIR']['beta'] * scales['SIR']['Xbeta'], params['SIR']['gamma'] * scales['SIR']['Xgamma']]
+    ode_data = solve_SIR(time, ini + fit_params).T
+    print(x, '-', ode_data[2][0])
+    x += 1
     return ode_data
 
 def SEI_test(use_SEIQRDP=False):
@@ -163,7 +163,7 @@ def SEI_test(use_SEIQRDP=False):
                       params['SEIQDRP']['gamma'] * scales['SIR']['Xgamma']]
     else:
         fit_params = [params['SIR']['beta'] * scales['SIR']['Xbeta'], params['SIR']['gamma'] * scales['SIR']['Xgamma']]
-    ode_data = solve_SIR(time, ini + fit_params).T
+    ode_data = solve_SEI(time, ini + fit_params).T
 
     return ode_data
 

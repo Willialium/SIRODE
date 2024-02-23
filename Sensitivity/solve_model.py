@@ -28,7 +28,6 @@ def solve_SIR(t, params):
         return dydt
     y = [params[0], params[1], params[2]]
     sol = odeint(odes, y, t, (params[3], params[4]))
-
     return sol
 
 def solve_SEI(t, params):
@@ -103,7 +102,6 @@ def solve_SEIQR(t, params):
 
 
 def solve_SEIQRDP(t, params):
-    # print('solving with:', params)
     def odes(y, t, alpha, beta, sigma, gamma, l1, l2, l3, k1, k2, k3):
         S, E, I, Q, R, D, P = y
 

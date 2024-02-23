@@ -194,7 +194,7 @@ def create_SIR_plot(ax, SIR_test_result):
     ax.legend()
 
     ode_latex = r'$\frac{dS}{dt} = -\beta SI$' + '\n' + \
-                r'$\frac{dI}{dt} = \beta SI$ - \gamma I' + '\n'  \
+                r'$\frac{dI}{dt} = \beta SI$ - ' + r'$\gamma I$' + '\n'  \
                 r'$\frac{dR}{dt} = \gamma I$'
 
     ax.annotate(ode_latex, xy=(1, 1), xycoords='axes fraction', fontsize=14, ha='left', va='top')
@@ -279,15 +279,15 @@ SIR_gammaSlider = create_slider(ax=fig.add_axes([0.54, 0.53, 0.26, 0.03]), label
 
 SEIR_betaSlider = create_slider(ax=fig.add_axes([0.1, 0.11, 0.26, 0.03]), label='Xbeta', valmin=-2, valmax=2, valinit=0, callback=update_SEIR)
 SEIR_sigmaSlider = create_slider(ax=fig.add_axes([0.1, 0.08, 0.26, 0.03]), label='Xsigma', valmin=-2, valmax=2, valinit=0, callback=update_SEIR)
-SEIR_gammaSlider = create_slider(ax=fig.add_axes([0.54, 0.5, 0.26, 0.03]), label='Xgamma', valmin=-2, valmax=2, valinit=0, callback=update_SEIR)
+SEIR_gammaSlider = create_slider(ax=fig.add_axes([0.1, 0.05, 0.26, 0.03]), label='Xgamma', valmin=-2, valmax=2, valinit=0, callback=update_SEIR)
 
-SEIRP_betaSlider = create_slider(ax=fig.add_axes([0.54, 0.11, 0.26, 0.03]), label='Xbeta', valmin=-2, valmax=2, valinit=0, callback=update_SEIRP)
-SEIRP_sigmaSlider = create_slider(ax=fig.add_axes([0.54, 0.08, 0.26, 0.03]), label='Xsigma', valmin=-2, valmax=2, valinit=0, callback=update_SEIRP)
-SEIRP_gammaSlider = create_slider(ax=fig.add_axes([0.54, 0.05, 0.26, 0.03]), label='Xgamma', valmin=-2, valmax=2, valinit=0, callback=update_SEIRP)
-SEIRP_alphaSlider = create_slider(ax=fig.add_axes([0.54, 0.02, 0.26, 0.03]), label='Xalpha', valmin=-2, valmax=2, valinit=0, callback=update_SEIRP)
+#SEIRP_betaSlider = create_slider(ax=fig.add_axes([0.54, 0.11, 0.26, 0.03]), label='Xbeta', valmin=-2, valmax=2, valinit=0, callback=update_SEIRP)
+#SEIRP_sigmaSlider = create_slider(ax=fig.add_axes([0.54, 0.08, 0.26, 0.03]), label='Xsigma', valmin=-2, valmax=2, valinit=0, callback=update_SEIRP)
+#SEIRP_gammaSlider = create_slider(ax=fig.add_axes([0.54, 0.05, 0.26, 0.03]), label='Xgamma', valmin=-2, valmax=2, valinit=0, callback=update_SEIRP)
+#SEIRP_alphaSlider = create_slider(ax=fig.add_axes([0.54, 0.02, 0.26, 0.03]), label='Xalpha', valmin=-2, valmax=2, valinit=0, callback=update_SEIRP)
 
 SEI_betaSlider = create_slider(ax=fig.add_axes([0.54, 0.11, 0.26, 0.03]), label='Xbeta', valmin=-2, valmax=2, valinit=0, callback=update_SEI)
-SEI_sigmaSlider = create_slider(ax=fig.add_axes([0.54, 0.11, 0.26, 0.03]), label='Xsigma', valmin=-2, valmax=2, valinit=0, callback=update_SEI)
+SEI_sigmaSlider = create_slider(ax=fig.add_axes([0.54, 0.08, 0.26, 0.03]), label='Xsigma', valmin=-2, valmax=2, valinit=0, callback=update_SEI)
 
 E0_slider = create_slider(ax=fig.add_axes([0.1, 0.97, 0.7, 0.03]), label='E0', valmin=0.00000001, valmax=0.001, valinit=inis['E0'], callback=update_all)
 I0_slider = create_slider(ax=fig.add_axes([0.1, 0.94, 0.7, 0.03]), label='I0', valmin=0.00000001, valmax=0.001, valinit=inis['I0'], callback=update_all)

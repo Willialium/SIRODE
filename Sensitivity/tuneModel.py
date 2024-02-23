@@ -61,7 +61,6 @@ def SIR_fit(data, params):
 
     result = minimize(objective_function, coef_guess, args=(time, confirmed, recovered), bounds=bounds)
     optimized_params = result.x
-
     params['SIR']['beta'] = optimized_params[0]
     params['SIR']['gamma'] = optimized_params[1]
 
