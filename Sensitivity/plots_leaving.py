@@ -7,7 +7,8 @@ from matplotlib.widgets import Slider, Button
 from models import scales, inis, params, time_interval
 
 EXCLUDE = 'S'
-base = 2
+base = 5
+scales['time'] = 4
 
 global use_SEIQRDP
 use_SEIQRDP = False
@@ -27,7 +28,6 @@ def find_intersection(str1, str2):
 def update_SIR(x, update=True):
     scales['SIR']['Xbeta'] = base**SIR_betaSlider.val
     scales['SIR']['Xgamma'] = base**SIR_gammaSlider.val
-
     SIR_Update = SIR_test(use_SEIQRDP)
     model_buffer = 0
 
@@ -101,14 +101,16 @@ def create_SIR_plot(ax, SIR_test_result):
 def create_d_plot(ax, SIR_test_result):
 
     lines = []
-
-    #dSdt = np.diff(SIR_test_result[0])
+    colors = ['yellow', 'red', 'orange']
+    dSdt = np.diff(SIR_test_result[0])
     dIdt = np.diff(SIR_test_result[1])
     dRdt = np.diff(SIR_test_result[2])
+    datas = [dSdt, dIdt, dRdt]
+    for i in range(3):
+        if 'SIR'[i] not in EXCLUDE:
+            lines.append(ax.plot(datas[i], color=colors[i], label='d'+'SIR'[i]+'/dt'))
 
-    #lines.append(ax.plot(dSdt, color='yellow', label='dS/dt'))
-    lines.append(ax.plot(dIdt, color='red', label='dI/dt'))
-    lines.append(ax.plot(dRdt, color='orange', label='dR/dt'))
+
     ax.legend()
 
     return lines
@@ -133,7 +135,7 @@ SIR_gammaSlider = create_slider(ax=fig.add_axes([0.1, 0.05, 0.26, 0.03]), label=
 
 R0_slider = create_slider(ax=fig.add_axes([0.1, 0.97, 0.7, 0.03]), label='R0', valmin=0.0000001, valmax=0.03, valinit=inis['R0'], callback=update_all)
 I0_slider = create_slider(ax=fig.add_axes([0.1, 0.94, 0.7, 0.03]), label='I0', valmin=0.0, valmax=.0001, valinit=inis['I0'], callback=update_all)
-time_slider = create_slider(ax=fig.add_axes([0.1, 0.91, 0.7, 0.03]), label='time', valmin=1, valmax=10, valinit=1, callback=update_all)
+time_slider = create_slider(ax=fig.add_axes([0.1, 0.91, 0.7, 0.03]), label='time', valmin=1, valmax=10, valinit=scales['time'], callback=update_all)
 
 button = Button(fig.add_axes([0.9, 0.9, 0.085, 0.085]), 'Use SEIQRDP\nparams', color='lightgrey', hovercolor='0.9')
 button.on_clicked(button_press)
