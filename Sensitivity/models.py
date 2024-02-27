@@ -111,13 +111,13 @@ params = {
 
 }
 
-SIS_fit(data, params)
-SIR_fit(data, params)
-SEI_fit(data, params)
-SEIR_fit(data, params)
-SEIRP_fit(data, params)
-SEIQR_fit(data, params)
-SEIQRDP_fit(data, params)
+#SIS_fit(data, params)
+#SIR_fit(data, params)
+#SEI_fit(data, params)
+#SEIR_fit(data, params)
+#SEIRP_fit(data, params)
+#SEIQR_fit(data, params)
+#SEIQRDP_fit(data, params)
 
 time_interval = len(data['Date'])
 
