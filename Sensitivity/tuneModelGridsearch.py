@@ -45,61 +45,76 @@ def SIR_fit(data, params):
     confirmed = data['Total_Current_Positive_Cases'].to_numpy()
     recovered = data['Recovered'].to_numpy()
 
-    coef_guess = [params['SIR']['beta'], params['SIR']['gamma']]
-    bounds = [
-        (0, 10),
-        (0, 10),
-    ]
+    max_I_index = np.argmax(confirmed)
+    max_I = confirmed[max_I_index]
 
-    def objective_function(params, time_points, confirmed, recovered):
-        I0 = confirmed[0]
-        R0 = recovered[0]
-        S0 = 1 - I0 - R0
-        params = params.tolist()
-        ini_values = [S0, I0, R0]
-        predicted_solution = solve_SIR(time_points, ini_values + params)
+    # Define the grid for parameter search
+    beta_values = np.linspace(0, 2, 41)  # Adjust the number of values and range as needed
+    gamma_values = np.linspace(0, 2, 41)  # Adjust the number of values and range as needed
 
-        SSI = np.sum((confirmed - predicted_solution[:, 1]) ** 2) * INFECTED_WEIGHT / len(confirmed)
-        SSR = np.sum((recovered - predicted_solution[:, 2]) ** 2) / len(recovered)
+    best_loss = float('inf')
+    best_params = {}
 
-        loss = SSI + SSR
-        return loss
+    for beta, gamma in product(beta_values, gamma_values):
+        def objective_function(beta, gamma, time_points):
+            I0 = confirmed[0]
+            R0 = recovered[0]
+            S0 = 1 - I0 - R0
+            params = [beta, gamma]
+            ini_values = [S0, I0, R0]
+            predicted_solution = solve_SIR(time_points, ini_values + params)
 
-    result = minimize(objective_function, coef_guess, args=(time, confirmed, recovered), bounds=bounds)
-    optimized_params = result.x
 
-    params['SIR']['beta'] = optimized_params[0]
-    params['SIR']['gamma'] = optimized_params[1]
+            loss = np.abs((np.max(predicted_solution[:,1])-max_I)/max_I)*40 + np.abs(np.argmax(predicted_solution[:,1]) - max_I_index)
+            return loss
+
+        loss = objective_function(beta, gamma, time)
+
+        # Update best parameters if current parameters yield lower loss
+        if loss < best_loss:
+            best_loss = loss
+            best_params['beta'] = beta
+            best_params['gamma'] = gamma
+
+    params['SIR']['beta'] = best_params['beta']
+    params['SIR']['gamma'] = best_params['gamma']
 
 def SEI_fit(data, params):
     time = data['Date'].to_numpy()
     time = [i for i in range(len(time))]
     confirmed = data['Total_Current_Positive_Cases'].to_numpy()
 
-    coef_guess = [params['SEI']['beta'], params['SEI']['sigma']]
-    bounds = [
-        (0, 10),
-        (0, 10),
-    ]
+    max_I_index = np.argmax(confirmed)
+    max_I = confirmed[max_I_index]
 
-    def objective_function(params, time_points, confirmed):
-        I0 = confirmed[0]
-        E0 = I0
-        S0 = 1 - I0 - E0
-        params = params.tolist()
-        ini_values = [S0, E0, I0]
-        predicted_solution = solve_SIR(time_points, ini_values + params)
+    beta_values = np.linspace(0, 2, 41)  # Adjust the number of values and range as needed
+    sigma_values = np.linspace(0, 2, 41)  # Adjust the number of values and range as needed
 
-        SSI = np.sum((confirmed - predicted_solution[:, 2]) ** 2) * INFECTED_WEIGHT / len(confirmed)
+    best_loss = float('inf')
+    best_params = {}
 
-        loss = SSI
-        return loss
+    for beta, sigma in product(beta_values, sigma_values):
+        def objective_function(beta, sigma, time_points):
+            I0 = confirmed[0]
+            E0 = I0
+            S0 = 1 - I0 - E0
+            params = [beta,sigma]
+            ini_values = [S0, E0, I0]
+            predicted_solution = solve_SIR(time_points, ini_values + params)
 
-    result = minimize(objective_function, coef_guess, args=(time, confirmed), bounds=bounds)
-    optimized_params = result.x
+            loss = np.abs((np.max(predicted_solution[:, 2]) - max_I) / max_I) * 40 + np.abs(
+                np.argmax(predicted_solution[:, 2]) - max_I_index)
 
-    params['SEI']['beta'] = optimized_params[0]
-    params['SEI']['sigma'] = optimized_params[1]
+            return loss
+
+        loss = objective_function(beta, sigma, time)
+
+        if loss < best_loss:
+            best_loss = loss
+            best_params['beta'] = beta
+            best_params['sigma'] = sigma
+    params['SEI']['beta'] = best_params['beta']
+    params['SEI']['sigma'] = best_params['sigma']
 
 
 def SEIR_fit(data, params):
@@ -108,33 +123,42 @@ def SEIR_fit(data, params):
     confirmed = data['Total_Current_Positive_Cases'].to_numpy()
     recovered = data['Recovered'].to_numpy()
 
-    coef_guess = [params['SEIR']['beta'], params['SEIR']['sigma'], params['SEIR']['gamma']]  # beta, sigma, gamma
-    bounds = [
-        (0, 1),
-        (0, 30),
-        (0, 1)
-    ]
-    def objective_function(params, time_points, confirmed, recovered):
-        I0 = confirmed[0]
-        E0 = confirmed[0]
-        R0 = recovered[0]
-        S0 = 1 - E0 - I0 - R0
-        params = params.tolist()
-        ini_values = [S0, E0, I0, R0]
-        predicted_solution = solve_SEIR(time_points, ini_values + params)
+    max_I_index = np.argmax(confirmed)
+    max_I = confirmed[max_I_index]
 
-        SSI = np.sum((confirmed - predicted_solution[:, 2]) ** 2) * INFECTED_WEIGHT / len(confirmed)
-        SSR = np.sum((recovered - predicted_solution[:, 3]) ** 2) / len(recovered)
+    beta_values = np.linspace(2, 4, 41)  # Adjust the number of values and range as needed
+    sigma_values = np.linspace(0, 1, 11)  # Adjust the number of values and range as needed
+    gamma_values = np.linspace(2, 4, 41)  # Adjust the number of values and range as needed
 
-        loss = SSI + SSR
-        return loss
+    best_loss = float('inf')
+    best_params = {}
 
-    result = minimize(objective_function, coef_guess, args=(time, confirmed, recovered), bounds=bounds)
-    optimized_params = result.x
+    for beta, sigma, gamma in product(beta_values, sigma_values, gamma_values):
+        def objective_function(beta, sigma, gamma, time_points):
+            I0 = confirmed[0]
+            E0 = I0
+            R0 = recovered[0]
+            S0 = 1 - I0 - E0 - R0
+            params = [beta,sigma, gamma]
+            ini_values = [S0, E0, I0, R0]
+            predicted_solution = solve_SEIR(time_points, ini_values + params)
 
-    params['SEIR']['beta'] = optimized_params[0]
-    params['SEIR']['sigma'] = optimized_params[1]
-    params['SEIR']['gamma'] = optimized_params[2]
+            loss = np.abs((np.max(predicted_solution[:, 2]) - max_I) / max_I) * 40 + np.abs(
+                np.argmax(predicted_solution[:, 2]) - max_I_index)
+
+            return loss
+
+        loss = objective_function(beta, sigma, gamma, time)
+
+        if loss < best_loss:
+            best_loss = loss
+            best_params['beta'] = beta
+            best_params['sigma'] = sigma
+            best_params['gamma'] = gamma
+
+    params['SEIR']['beta'] = best_params['beta']
+    params['SEIR']['sigma'] = best_params['sigma']
+    params['SEIR']['gamma'] = best_params['gamma']
 
 
 def SEIRP_fit(data, params):
@@ -143,37 +167,46 @@ def SEIRP_fit(data, params):
     confirmed = data['Total_Current_Positive_Cases'].to_numpy()
     recovered = data['Recovered'].to_numpy()
 
-    # alpha, beta, sigma, gamma
-    coef_guess = [params['SEIRP']['alpha'], params['SEIRP']['beta'], params['SEIRP']['sigma'], params['SEIRP']['gamma']]
-    bounds = [
-        (0, 1),
-        (0, 1),
-        (0, 30),
-        (0, 1)
-    ]
+    max_I_index = np.argmax(confirmed)
+    max_I = confirmed[max_I_index]
 
-    def objective_function(params, time_points, confirmed, recovered):
-        I0 = confirmed[0]
-        E0 = confirmed[0]
-        R0 = recovered[0]
-        S0 = 1 - E0 - I0 - R0
-        params = params.tolist()
-        ini_values = [S0, E0, I0, R0, 0]
-        predicted_solution = solve_SEIRP(time_points, ini_values + params)
+    alpha_values = np.linspace(0, 1, 13)  # Adjust the number of values and range as needed
+    beta_values = np.linspace(0, 1, 41)  # Adjust the number of values and range as needed
+    sigma_values = np.linspace(0, 1, 11)  # Adjust the number of values and range as needed
+    gamma_values = np.linspace(0, 1, 41)  # Adjust the number of values and range as needed
 
-        SSI = np.sum((confirmed - predicted_solution[:, 2]) ** 2) * INFECTED_WEIGHT / len(confirmed)
-        SSR = np.sum((recovered - predicted_solution[:, 3]) ** 2) / len(recovered)
+    best_loss = float('inf')
+    best_params = {}
+    for alpha, beta, sigma, gamma in product(alpha_values, beta_values, sigma_values, gamma_values):
+        def objective_function(alpha, beta, sigma, gamma, time_points):
+            I0 = confirmed[0]
+            E0 = I0
+            R0 = recovered[0]
+            S0 = 1 - I0 - E0 - R0
+            params = [alpha, beta, sigma, gamma]
+            ini_values = [S0, E0, I0, R0, 0]
+            predicted_solution = solve_SEIRP(time_points, ini_values + params)
 
-        loss = SSI + SSR
-        return loss
+            I_loss = np.abs((np.max(predicted_solution[:, 2]) - max_I) / max_I) * 40 + np.abs(
+                np.argmax(predicted_solution[:, 2]) - max_I_index)
 
-    result = minimize(objective_function, coef_guess, args=(time, confirmed, recovered), bounds=bounds)
-    optimized_params = result.x
+            R_loss = np.abs((predicted_solution[:, 3][-1] - recovered[-1]) / recovered[-1])
 
-    params['SEIRP']['alpha'] = optimized_params[0]
-    params['SEIRP']['beta'] = optimized_params[1]
-    params['SEIRP']['sigma'] = optimized_params[2]
-    params['SEIRP']['gamma'] = optimized_params[3]
+            return I_loss + R_loss
+
+        loss = objective_function(alpha, beta, sigma, gamma, time)
+
+        if loss < best_loss:
+            best_loss = loss
+            best_params['alpha'] = alpha
+            best_params['beta'] = beta
+            best_params['sigma'] = sigma
+            best_params['gamma'] = gamma
+
+    params['SEIRP']['alpha'] = best_params['alpha']
+    params['SEIRP']['beta'] = best_params['beta']
+    params['SEIRP']['sigma'] = best_params['sigma']
+    params['SEIRP']['gamma'] = best_params['gamma']
 
 
 def SEIQR_fit(data, params):
