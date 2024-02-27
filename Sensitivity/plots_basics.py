@@ -6,8 +6,8 @@ from models import SIS_test, SIR_test, SEI_test, SEIR_test, SEIRP_test, data
 from matplotlib.widgets import Slider, Button
 from models import scales, inis, params
 
-EXCLUDE = 'S'
-base = 2
+EXCLUDE = 'SER'
+base = 3
 
 global use_SEIQRDP
 use_SEIQRDP = False
@@ -19,33 +19,13 @@ def create_slider(ax, label, valmin, valmax, valinit, callback):
     return slider
 def find_intersection(str1, str2):
     return "".join(set(str1).intersection(set(str2)))
-def update_params():
-    with open('params.txt', 'w') as f:
-
-        temp_params = copy.deepcopy(params)
-
-        temp_params['SIS']['beta'] *= scales['SIS']['Xbeta']
-
-        temp_params['SIR']['beta'] *= scales['SIR']['Xbeta']
-        temp_params['SIR']['gamma'] *= scales['SIR']['Xgamma']
-
-        temp_params['SEIR']['beta'] *= scales['SEIR']['Xbeta']
-        temp_params['SEIR']['sigma'] *= scales['SEIR']['Xsigma']
-        temp_params['SEIR']['gamma'] *= scales['SEIR']['Xgamma']
-
-        temp_params['SEIRP']['sigma'] *= scales['SEIRP']['Xsigma']
-        temp_params['SEIRP']['beta'] *= scales['SEIRP']['Xbeta']
-        temp_params['SEIRP']['gamma'] *= scales['SEIRP']['Xgamma']
-        temp_params['SEIRP']['alpha'] *= scales['SEIRP']['Xalpha']
-
-        f.write(json.dumps(temp_params, indent=3))
 
 #############################
 ##### UPDATE FUNCTIONS  #####
 #############################
-def update_SIS(x, update=True):
+def update_SIS(x, update=False):
     scales['SIS']['Xbeta'] = base**SIS_betaSlider.val
-    if update: update_params()
+
 
     SIS_Update = SIS_test(use_SEIQRDP)
     model_buffer = 0
@@ -59,10 +39,9 @@ def update_SIS(x, update=True):
     ax1.autoscale_view()
     ax1.title.set_text(f'beta = {params["SIS"]["beta"]*scales["SIS"]["Xbeta"]:.2f}')
     fig.canvas.draw_idle()
-def update_SIR(x, update=True):
+def update_SIR(x, update=False):
     scales['SIR']['Xbeta'] = base**SIR_betaSlider.val
     scales['SIR']['Xgamma'] = base**SIR_gammaSlider.val
-    if update: update_params()
 
     SIR_Update = SIR_test(use_SEIQRDP)
     model_buffer = 0
@@ -76,11 +55,10 @@ def update_SIR(x, update=True):
     ax2.autoscale_view()
     ax2.title.set_text(f'beta = {params["SIR"]["beta"]*scales["SIR"]["Xbeta"]:.2f}, gamma = {params["SIR"]["gamma"]*scales["SIR"]["Xgamma"]:.2f}')
     fig.canvas.draw_idle()
-def update_SEIR(x, update=True):
+def update_SEIR(x, update=False):
     scales['SEIR']['Xbeta'] = base**SEIR_betaSlider.val
     scales['SEIR']['Xsigma'] = base**SEIR_sigmaSlider.val
     scales['SEIR']['Xgamma'] = base**SEIR_gammaSlider.val
-    if update: update_params()
 
     SEIR_Update = SEIR_test(use_SEIQRDP)
     model_buffer = 0
@@ -94,12 +72,11 @@ def update_SEIR(x, update=True):
     ax3.autoscale_view()
     ax3.title.set_text(f'beta = {params["SEIR"]["beta"]*scales["SEIR"]["Xbeta"]:.2f}, sigma = {params["SEIR"]["sigma"]*scales["SEIR"]["Xsigma"]:.2f}, gamma = {params["SEIR"]["gamma"]*scales["SEIR"]["Xgamma"]:.2f}')
     fig.canvas.draw_idle()
-def update_SEIRP(x, update=True):
+def update_SEIRP(x, update=False):
     scales['SEIRP']['Xbeta'] = base**SEIRP_betaSlider.val
     scales['SEIRP']['Xsigma'] = base**SEIRP_sigmaSlider.val
     scales['SEIRP']['Xgamma'] = base**SEIRP_gammaSlider.val
     scales['SEIRP']['Xalpha'] = base**SEIRP_alphaSlider.val
-    if update: update_params()
 
     SEIRP_Update = SEIRP_test(use_SEIQRDP)
     model_buffer = 0
@@ -113,10 +90,9 @@ def update_SEIRP(x, update=True):
     ax4.autoscale_view()
     ax4.title.set_text(f'alpha = {params["SEIRP"]["alpha"]*scales["SEIRP"]["Xalpha"]:.2f}, beta = {params["SEIRP"]["beta"]*scales["SEIRP"]["Xbeta"]:.2f}, sigma = {params["SEIRP"]["sigma"]*scales["SEIRP"]["Xsigma"]:.2f}, gamma = {params["SEIRP"]["gamma"]*scales["SEIRP"]["Xgamma"]:.2f}')
     fig.canvas.draw_idle()
-def update_SEI(x, update=True):
+def update_SEI(x, update=False):
     scales['SEI']['Xbeta'] = base**SEI_betaSlider.val
     scales['SEI']['Xsigma'] = base**SEI_sigmaSlider.val
-    if update: update_params()
 
     SEI_Update = SEI_test(use_SEIQRDP)
     model_buffer = 0
@@ -140,7 +116,6 @@ def update_all(x):
     #update_SEIRP(x, update=False)
     update_SEI(x, update=False)
 
-    update_params()
 def button_press(x):
     global use_SEIQRDP
     use_SEIQRDP = not use_SEIQRDP
@@ -157,6 +132,8 @@ def button_press(x):
 def create_real_plot(ax, name):
     time = np.arange(0, len(data))
     for cat in name:
+        if cat in EXCLUDE:
+            continue
         if cat == 'I':
             ax.scatter(time, data['Total_Current_Positive_Cases'], s=.4, color='red')
         elif cat == 'R':
@@ -247,7 +224,6 @@ def create_SEI_plot(ax, SEI_test_result):
                 r'$\frac{dI}{dt} = \sigma E$'
     ax.annotate(ode_latex, xy=(1, 1), xycoords='axes fraction', fontsize=14, ha='left', va='top')
     return lines
-update_params()
 
 #########################
 ##### CREATE FIGURE #####

@@ -2,7 +2,8 @@ import numpy as np
 import pandas as pd
 
 from solve_model import solve_SIS, solve_SIR, solve_SEI, solve_SEIR, solve_SEIRP, solve_SEIQR, solve_SEIQRDP
-from tuneModel import SIS_fit, SIR_fit, SEI_fit, SEIR_fit, SEIRP_fit, SEIQR_fit, SEIQRDP_fit
+from tuneModel import SIS_fit, SEIQR_fit, SEIQRDP_fit
+from tuneModelGridsearch import SIR_fit, SEI_fit, SEIR_fit, SEIRP_fit
 
 pop = 6e7
 data = pd.read_csv('../combined_data.csv')[
@@ -70,23 +71,23 @@ params = {
         'beta': 0.14566402868860248
     },
     'SIR': {
-        'beta': 0.14566402868860248,
-        'gamma': 0.1190359988506418
+        'beta': 1.25,
+        'gamma': 1.14
     },
     'SEI': {
         'beta': 0.14566402868860248,
         'sigma': 15.760004176832581
     },
     'SEIR': {
-        'beta': 0.14566402868860248,
-        'sigma': 15.760004176832581,
-        'gamma': 0.1190359988506418
+        'beta': 3.3,
+        'sigma': .73,
+        'gamma': 2.6
     },
     'SEIRP': {
-        'alpha': 0.07857877806639593,
-        'beta': 0.7616387849526338,
-        'sigma': 0.13889549106916346,
-        'gamma': 0.024872143950524284
+        'alpha': 0.08,
+        'beta': 0.98,
+        'sigma': 0.1,
+        'gamma': 0.03
     },
     'SEIQR': {
         'beta': 0.7809947912506932,
@@ -145,6 +146,7 @@ def SIR_test(use_SEIQRDP=False):
     else:
         fit_params = [params['SIR']['beta'] * scales['SIR']['Xbeta'], params['SIR']['gamma'] * scales['SIR']['Xgamma']]
     ode_data = solve_SIR(time, ini + fit_params).T
+    print(params['SIR'])
     return ode_data
 
 def SEI_test(use_SEIQRDP=False):
@@ -158,7 +160,7 @@ def SEI_test(use_SEIQRDP=False):
         fit_params = [params['SEIQDRP']['beta'] * scales['SIR']['Xbeta'],
                       params['SEIQDRP']['gamma'] * scales['SIR']['Xgamma']]
     else:
-        fit_params = [params['SIR']['beta'] * scales['SIR']['Xbeta'], params['SIR']['gamma'] * scales['SIR']['Xgamma']]
+        fit_params = [params['SEI']['beta'] * scales['SEI']['Xbeta'], params['SEI']['sigma'] * scales['SEI']['Xsigma']]
     ode_data = solve_SEI(time, ini + fit_params).T
 
     return ode_data
